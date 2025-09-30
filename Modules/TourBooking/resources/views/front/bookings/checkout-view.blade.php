@@ -52,132 +52,11 @@
                             <h2 class="tg-checkout-form-title tg-checkout-form-title-3 mb-15">Your Order</h2>
 
                             @php
-                                $req = request();
-
-                                // Service & availability (dacă nu sunt deja injectate)
-                                $serviceId      = (int)($req->input('service_id'));
-                                $service        = $service ?? (\Modules\TourBooking\Entities\Service::find($serviceId));
-                                $availabilityId = $req->input('availability_id');
-                                $availability   = (isset($availability) && $availability) ? $availability : null;
-
-                                if (!$availability && $service && $availabilityId) {
-                                    $availability = optional($service->availabilities)->firstWhere('id', (int)$availabilityId);
-                                }
-
-                                // Age categories din service (doar cele enabled)
-                                $ageCatsRaw = $service
-                                    ? (is_array($service->age_categories) ? $service->age_categories : (json_decode($service->age_categories ?? '[]', true) ?: []))
-                                    : [];
-                                $enabledAgeCats = collect($ageCatsRaw)->filter(fn($c) => !empty($c['enabled']));
-
-                                // Labels & intervale
-                                $labelsByAge = $enabledAgeCats->mapWithKeys(function ($cfg, $key) {
-                                    return [$key => ($cfg['label'] ?? ucfirst($key))];
-                                })->toArray();
-                                $rangeByAge = $enabledAgeCats->mapWithKeys(function ($cfg, $key) {
-                                    $min = $cfg['min_age'] ?? null;
-                                    $max = $cfg['max_age'] ?? null;
-                                    if ($min !== null && $max !== null) {
-                                        return [$key => ((int)$max >= 120 ? "($min+ years)" : "($min-$max years)")];
-                                    }
-                                    if ($min !== null && ($max === null || (int)$max === 0)) return [$key => "($min+ years)"];
-                                    if ($max !== null) return [$key => "(0-$max years)"];
-                                    return [$key => ""];
-                                })->toArray();
-
-                                // Prețuri de bază din service
-                                $pricesByAge = $enabledAgeCats->mapWithKeys(function ($cfg, $key) {
-                                    return [$key => (float)($cfg['price'] ?? 0)];
-                                })->toArray();
-
-                                // Override din availability: json age_categories sau special/children legacy
-                                if ($availability) {
-                                    $avAgeJson = is_array($availability->age_categories)
-                                        ? $availability->age_categories
-                                        : (json_decode($availability->age_categories ?? '[]', true) ?: []);
-
-                                    if (!empty($avAgeJson)) {
-                                        foreach ($avAgeJson as $k => $v) {
-                                            if (array_key_exists($k, $pricesByAge)) {
-                                                $pricesByAge[$k] = (float)($v ?? 0);
-                                            }
-                                        }
-                                    } else {
-                                        if (isset($availability->special_price) && array_key_exists('adult', $pricesByAge)) {
-                                            $pricesByAge['adult'] = (float)$availability->special_price;
-                                        }
-                                        if (isset($availability->per_children_price) && array_key_exists('child', $pricesByAge)) {
-                                            $pricesByAge['child'] = (float)$availability->per_children_price;
-                                        }
-                                    }
-                                }
-
-                                // Cantități din noul flux (age_quantities[...])
-                                $ageQuantities = $req->input('age_quantities', []);
-                                $hasAgeQuantities = is_array($ageQuantities) && count(array_filter($ageQuantities, fn($q)=> (int)$q > 0)) > 0;
-
-                                // Fallback vechi
-                                $personQty   = $data['personCount'] ?? (int)$req->input('person', 0);
-                                $childrenQty = $data['childCount']  ?? (int)$req->input('children', 0);
-                                $personUnit  = $availability->special_price      ?? ($service->price_per_person ?? 0);
-                                $childUnit   = $availability->per_children_price ?? ($service->child_price      ?? 0);
-
-                                // Extras
-                                if (isset($data['extras'])) {
-                                    $extras = collect($data['extras']);
-                                } else {
-                                    $extrasIds = $req->input('extras', []);
-                                    $extras = $service ? $service->extraCharges()->whereIn('id', (array)$extrasIds)->get() : collect();
-                                }
-
-                                // Construim liniile & totalurile
-                                $ticketLines    = [];
-                                $ticketSubtotal = 0.0;
-
-                                if ($hasAgeQuantities) {
-                                    foreach ($ageQuantities as $k => $qty) {
-                                        $qty = (int)$qty;
-                                        if ($qty <= 0) continue;
-
-                                        $unit = (float)($pricesByAge[$k] ?? 0);
-                                        $lineTotal = $qty * $unit;
-
-                                        $ticketLines[] = [
-                                            'label' => $labelsByAge[$k] ?? ucfirst($k),
-                                            'range' => $rangeByAge[$k]  ?? '',
-                                            'qty'   => $qty,
-                                            'unit'  => $unit,
-                                            'total' => $lineTotal,
-                                        ];
-                                        $ticketSubtotal += $lineTotal;
-                                    }
-                                } else {
-                                    if ($personQty > 0) {
-                                        $lineTotal = $personQty * (float)$personUnit;
-                                        $ticketLines[] = [
-                                            'label' => 'Person',
-                                            'range' => '(18+ years)',
-                                            'qty'   => $personQty,
-                                            'unit'  => (float)$personUnit,
-                                            'total' => $lineTotal,
-                                        ];
-                                        $ticketSubtotal += $lineTotal;
-                                    }
-                                    if ($childrenQty > 0) {
-                                        $lineTotal = $childrenQty * (float)$childUnit;
-                                        $ticketLines[] = [
-                                            'label' => 'Children',
-                                            'range' => '(13-17 years)',
-                                            'qty'   => $childrenQty,
-                                            'unit'  => (float)$childUnit,
-                                            'total' => $lineTotal,
-                                        ];
-                                        $ticketSubtotal += $lineTotal;
-                                    }
-                                }
-
+                                // Use the properly computed data from the controller instead of recalculating
+                                $ticketLines = $data['lines'] ?? [];
+                                $grandTotal = $data['total'] ?? 0;
+                                $extras = $data['extras'] ?? collect();
                                 $extrasTotal = (float)$extras->sum('price');
-                                $grandTotal  = $ticketSubtotal + $extrasTotal;
                             @endphp
 
                             <div>
@@ -187,35 +66,37 @@
                                     <span class="tg-tour-about-sidebar-title">Tickets:</span>
 
                                     @forelse($ticketLines as $line)
-                                        <div class="tg-tour-about-tickets mb-10">
-                                            <div class="tg-tour-about-tickets-adult">
-                                                <span>{{ $line['label'] }}</span>
-                                                @if($line['range'])
-                                                    <p class="mb-0">{{ $line['range'] }}</p>
-                                                @endif
+                                        @if(!($line['is_extra'] ?? false))
+                                            <div class="tg-tour-about-tickets mb-10">
+                                                <div class="tg-tour-about-tickets-adult">
+                                                    <span>{{ $line['label'] }}</span>
+                                                </div>
+                                                <div class="tg-tour-about-tickets-quantity">
+                                                    {{ $line['qty'] }}
+                                                    x {{ currency($line['unit']) }}
+                                                    = {{ currency($line['subtotal']) }}
+                                                </div>
                                             </div>
-                                            <div class="tg-tour-about-tickets-quantity">
-                                                {{ $line['qty'] }}
-                                                x {{ currency_price($line['unit']) }}
-                                                = {{ currency($line['total'], 2) }}
-                                            </div>
-                                        </div>
+                                        @endif
                                     @empty
                                         <div class="text-muted">No tickets selected.</div>
                                     @endforelse
                                 </div>
 
-                                @if($extras->count() > 0)
+                                @php
+                                    $extraLines = collect($ticketLines)->filter(fn($line) => $line['is_extra'] ?? false);
+                                @endphp
+                                @if($extraLines->count() > 0)
                                     <div class="tg-tour-about-extra mb-10">
                                         <span class="tg-tour-about-sidebar-title mb-10 d-inline-block">Add Extra:</span>
                                         <div class="tg-filter-list">
                                             <ul>
-                                                @foreach ($extras as $extra)
+                                                @foreach ($extraLines as $line)
                                                     <li>
                                                         <div class="checkbox d-flex">
-                                                            <label class="tg-label">{{ $extra->name }}</label>
+                                                            <label class="tg-label">{{ $line['label'] }}</label>
                                                         </div>
-                                                        <span class="quantity">{{ currency($extra->price) }}</span>
+                                                        <span class="quantity">{{ currency($line['subtotal']) }}</span>
                                                     </li>
                                                 @endforeach
                                             </ul>

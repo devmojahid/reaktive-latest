@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+
 use Illuminate\View\View;
 use Modules\TourBooking\App\Models\Availability;
 use Modules\TourBooking\App\Models\Booking;
@@ -45,6 +46,7 @@ final class FrontBookingController extends Controller
         /** @var Service $service */
         $service = Service::where('id', $request->service_id)
             ->where('status', true)
+            ->with('availabilities')
             ->firstOrFail();
 
         // data este obligatorie pentru calculul corect pe availability
@@ -104,8 +106,10 @@ final class FrontBookingController extends Controller
             ->where('status', true)
             ->get();
 
-        // === PREȚURI unitare pe categorii (logica identică cu cea din listare) ==
-        $unit = $this->computeCategoryPrices($service, $availability);
+        // === PREȚURI unitare pe categorii (folosim Service model methods) ==
+        $unit = $service->effectivePriceSetForDate($date);
+        
+
 
         // === Liniile de comandă & total ========================================
         $lines = [];
@@ -122,6 +126,7 @@ final class FrontBookingController extends Controller
 
                 $lines[] = [
                     'label'    => ucfirst($k),
+                    'key'      => $k,  // Store original age category key
                     'qty'      => $count,
                     'unit'     => $price,
                     'subtotal' => $line,
@@ -132,6 +137,7 @@ final class FrontBookingController extends Controller
             $fixed = (float)($service->discount_price ?? $service->full_price ?? 0);
             $lines[] = [
                 'label'    => $service->translation->title ?? 'Service',
+                'key'      => 'service',
                 'qty'      => 1,
                 'unit'     => $fixed,
                 'subtotal' => $fixed,
@@ -145,6 +151,7 @@ final class FrontBookingController extends Controller
             $price = (float)$e->price;
             $lines[] = [
                 'label'    => $e->name,
+                'key'      => 'extra_' . $e->id,
                 'qty'      => 1,
                 'unit'     => $price,
                 'subtotal' => $price,
@@ -174,6 +181,26 @@ final class FrontBookingController extends Controller
             'ageQuantities' => $qty,
         ];
 
+        // === Create age config for booking storage ===
+        $ageConfig = [];
+        $ageBreakdown = [];
+        
+        foreach ($lines as $line) {
+            if (!($line['is_extra'] ?? false) && isset($line['key'])) {
+                $key = $line['key']; // Use original age category key
+                $ageConfig[$key] = [
+                    'label' => $line['label'],
+                    'price' => $line['unit'],
+                ];
+                $ageBreakdown[$key] = [
+                    'label' => $line['label'],
+                    'qty'   => $line['qty'],
+                    'price' => $line['unit'],
+                    'line'  => $line['subtotal'],
+                ];
+            }
+        }
+
         // === Sesiune (fără dublări) ============================================
         session()->forget('payment_cart');
         session()->put('payment_cart', [
@@ -185,6 +212,8 @@ final class FrontBookingController extends Controller
             'person_count'    => 0,
             'child_count'     => 0,
             'age_quantities'  => $qty,
+            'age_config'      => $ageConfig,
+            'age_breakdown'   => $ageBreakdown,
             'total'           => $total,
             'extra_charges'   => $extraCharges->sum('price'),
             'extra_services'  => $extraCharges->pluck('id')->all(),

@@ -102,6 +102,15 @@ final class FrontServiceController extends Controller
 
 
     /**
+     * CANONICAL METHOD (for new API calls):
+     * Get availability by date with proper method name.
+     */
+    public function getAvailabilityByDate(Request $request)
+    {
+        return $this->getAvailityByDate($request);
+    }
+
+    /**
      * LEGACY PROXY:
      * Păstrat pentru compatibilitate. Delegă spre metoda canonică.
      */
@@ -541,6 +550,23 @@ final class FrontServiceController extends Controller
 
         $popularServices = $this->popularServices();
 
+        // Prepare availability map for frontend
+        $availabilityMap = [];
+        foreach ($service->availabilities as $availability) {
+            $date = $availability->date->format('Y-m-d');
+            $availabilityMap[$date] = [
+                'id' => $availability->id,
+                'spots' => $availability->available_spots,
+                'special_price' => $availability->special_price,
+                'per_children_price' => $availability->per_children_price,
+                'notes' => $availability->notes,
+                'start_time' => $availability->start_time ? $availability->start_time->format('H:i') : null,
+                'end_time' => $availability->end_time ? $availability->end_time->format('H:i') : null,
+                'is_available' => (bool) $availability->is_available,
+                'age_categories' => $availability->normalizedAgeCategories(),
+            ];
+        }
+
         return view($serviceView, compact(
             'service',
             'paginatedReviews',
@@ -548,7 +574,8 @@ final class FrontServiceController extends Controller
             'reviews',
             'avgRating',
             'popularServices',
-            'amenities'
+            'amenities',
+            'availabilityMap'
         ));
     }
 

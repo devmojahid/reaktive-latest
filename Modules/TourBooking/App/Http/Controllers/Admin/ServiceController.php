@@ -62,7 +62,7 @@ final class ServiceController extends Controller
         $data = $request->validated();
 
         // === Age categories (normalize + validate) ===
-        $data['age_categories'] = $this->normalizeAgeCategories($request->input('age_categories', []));
+        $data['age_categories'] = $this->normalizeAgeCategories($request->validated()['age_categories'] ?? []);
 
         // JSON fields
         foreach (['included','excluded','facilities','rules','safety','social_links'] as $field) {
@@ -170,7 +170,7 @@ final class ServiceController extends Controller
 
         if ($lang_code === admin_lang()) {
             // Age categories
-            $data['age_categories'] = $this->normalizeAgeCategories($request->input('age_categories', []));
+            $data['age_categories'] = $this->normalizeAgeCategories($request->validated()['age_categories'] ?? []);
 
             // JSON fields
             foreach (['included','excluded','facilities','rules','safety','social_links'] as $field) {
@@ -571,7 +571,7 @@ final class ServiceController extends Controller
         // NEW: age_categories per-zi (dacă e trimis din form)
         if ($request->has('age_categories')) {
             $payload['age_categories'] = $this->normalizeAvailabilityAgeCategories(
-                $request->input('age_categories', [])
+                $request['age_categories'] ?? []
             );
         }
 
@@ -634,7 +634,7 @@ final class ServiceController extends Controller
         // NEW: age_categories per-zi (dacă e trimis din form)
         if ($request->has('age_categories')) {
             $data['age_categories'] = $this->normalizeAvailabilityAgeCategories(
-                $request->input('age_categories', [])
+                $request['age_categories'] ?? []
             );
         }
 
@@ -737,7 +737,7 @@ final class ServiceController extends Controller
 
     /**
      * Normalizează age_categories pentru **Availability** (pe o singură zi).
-     * Aici NU obligăm min/max – doar enabled/count/price, exact ce folosește frontul.
+     * Salvează min/max age dacă sunt furnizate în request.
      */
     private function normalizeAvailabilityAgeCategories(array $input): array
     {
@@ -750,14 +750,15 @@ final class ServiceController extends Controller
             $enabled = isset($cfg['enabled']) && (bool)$cfg['enabled'];
             $count   = isset($cfg['count'])   ? (int)$cfg['count']   : 0;
             $price   = array_key_exists('price', $cfg) && $cfg['price'] !== '' ? (float)$cfg['price'] : null;
+            $min_age = isset($cfg['min_age']) && is_numeric($cfg['min_age']) ? (int)$cfg['min_age'] : null;
+            $max_age = isset($cfg['max_age']) && is_numeric($cfg['max_age']) ? (int)$cfg['max_age'] : null;
 
             $out[$k] = [
                 'enabled' => $enabled,
                 'count'   => $count,
                 'price'   => $price,
-                // min/max lăsate intenționat pe null la availability
-                'min_age' => null,
-                'max_age' => null,
+                'min_age' => $min_age,
+                'max_age' => $max_age,
             ];
         }
 
