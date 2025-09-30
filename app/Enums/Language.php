@@ -13,6 +13,7 @@ enum Language: string
     case Japanese = 'Japanese';
     case Arabic = 'Arabic';
     case Russian = 'Russian';
+   case Bangla= 'Bangla';
 
     public static function values(): array
     {
