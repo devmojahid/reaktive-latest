@@ -1,0 +1,108 @@
+
+  }
+}
+
+/* === Capsule custom (Destination / Guide language) ======================= */
+#hero-search .tg-booking-add-input-field{
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;   /* text la stânga */
+  gap: 12px !important;
+  width: 100% !important;
+  min-height: 56px !important;
+  padding: 14px 16px !important;
+  box-sizing: border-box !important;
+  text-align: left !important;
+}
+#hero-search .tg-booking-add-input-field .tg-booking-title-value{
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  flex: 1 1 auto !important;                /* ocupă lățimea */
+  text-align: left !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  font-size: 16px !important;
+  line-height: 1.4 !important;
+  font-weight: 500 !important;
+}
+/* placeholder (gri) vs valoare (închis) */
+#hero-search .tg-booking-add-input-field .tg-booking-title-value.is-placeholder{ color: #9AA3B2 !important; }
+#hero-search .tg-booking-add-input-field .tg-booking-title-value.is-value{       color: #111827 !important; }
+/* iconul din dreapta: nu împinge textul și nu afișează text fallback */
+#hero-search .tg-booking-add-input-field .location{
+  flex: 0 0 auto !important;
+  margin-left: auto !important;
+  opacity: .8 !important;
+  font-size: 0 !important;                  /* ascunde „… icon …” dacă apare ca text */
+}
+#hero-search .tg-booking-add-input-field .location svg{ font-size: initial !important; }
+
+/* === Câmpul de dată: aceeași înălțime și aliniere la stânga ============== */
+#hero-search .tg-booking-add-input-date{
+  min-height: 56px !important;
+  width: 100% !important;
+}
+#hero-search .tg-booking-add-input-date .input{
+  height: 56px !important;
+  padding: 0 16px !important;
+  text-align: left !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+}
+
+/* === Butonul de căutare: mărime/aliniere ================================ */
+#hero-search .tg-booking-form-search-btn{
+  margin: 0 !important;
+  align-self: end !important;               /* aliniat cu baza celorlalte capsule */
+}
+#hero-search .bk-search-button.bk-search-icon-only{
+  width: 44px !important;
+  height: 56px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 16px !important;
+  background: #ff4200 !important;
+  color: #fff !important;
+  border: none !important;
+}
+#hero-search .bk-search-button.bk-search-icon-only svg{ color:#fff !important; }
+
+/* === Neutralizări care stricau alinierea ================================ */
+#hero-search .tg-booking-form-parent-inner{       margin-right: 0 !important; }
+#hero-search .tg-booking-form-parent-inner.mb-15{ margin-bottom: 8px !important; }
+
+/* === Pastile (rail) + flyout ============================================ */
+#hero-search{ --pill-color:#737374; }
+#hero-search .filter-rail{ background:#fff; border-radius:4px; padding:10px 8px; overflow:visible !important; }
+#hero-search .filter-track{ display:flex; gap:14px; align-items:center; overflow-x:auto; scrollbar-width:thin; }
+#hero-search .pill{ position:relative; flex:0 0 auto; }
+#hero-search .pill-btn{
+  display:inline-flex; align-items:center; gap:10px;
+  padding:8px 14px; border-radius:8px; background:#fff;
+  border:1px solid var(--pill-color); color:var(--pill-color); font-weight:600;
+}
+#hero-search .pill-btn:hover{ border-color:#ff4200; }
+/* flyout montat în <body> de JS */
+#pill-flyout{ position:fixed; z-index:9999; display:none; }
+#pill-flyout .pill-menu{
+  display:block; position:static; min-width:240px;
+  background:#fff; border:1px solid #E5E7EB; border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,.08); padding:8px;
+}
+#pill-flyout .pill-item{
+  display:flex; justify-content:space-between; align-items:center;
+  gap:12px; padding:10px 12px; border-radius:4px; color:#111827; text-decoration:none;
+}
+#pill-flyout .pill-item:hover{ background:#FFF3ED; color:#ff4200; }
+
+/* === Responsive ========================================================== */
+@media (max-width: 991.98px){
+  #hero-search .tg-booking-form-input-group.hero-grid{ grid-template-columns:1fr !important; }
+  #hero-search .bk-search-button.bk-search-icon-only{ width:100%; height:56px; }
+}
+
+
+

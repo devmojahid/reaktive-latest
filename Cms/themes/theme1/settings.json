@@ -1,0 +1,464 @@
+{
+    "theme1_slider": {
+        "builder": true,
+        "name": "Theme1 Slider Section",
+        "theme": "theme1",
+        "order": 1,
+        "page": "home",
+        "content": {
+            "show_navigation": {
+                "type": "radio",
+                "label": "Show Navigation Arrows",
+                "required": true,
+                "options": {
+                    "1": "Yes",
+                    "0": "No"
+                },
+                "inline": true,
+                "default": "1"
+            },
+            "sub_title": {
+                "type": "text",
+                "label": "Sub Title",
+                "required": true,
+                "help": "Sub title with HTML formatting"
+            },
+            "title": {
+                "type": "text",
+                "label": "Main Title",
+                "required": true,
+                "help": "Main title with HTML formatting"
+            },
+            "description": {
+                "type": "textarea",
+                "label": "Description",
+                "help": "Brief description below the heading",
+                "maxlength": 200
+            },
+            "price_subtitle": {
+                "type": "text",
+                "label": "Price Sub Title",
+                "maxlength": 200
+            },
+            "currency_symbol": {
+                "type": "text",
+                "label": "Currency Symbol",
+                "maxlength": 200
+            },
+            "price": {
+                "type": "number",
+                "label": "Price",
+                "maxlength": 200
+            },
+            "per_time": {
+                "type": "text",
+                "label": "Per Time",
+                "maxlength": 200
+            },
+            "button_text": {
+                "type": "text",
+                "label": "Button Text",
+                "help": "Text to display on the call-to-action button"
+            },
+            "button_url": {
+                "type": "text",
+                "label": "Button URL",
+                "help": "URL for the call-to-action button"
+            },
+            "slides": {
+                "type": "repeater",
+                "label": "Slider Items",
+                "min": 1,
+                "max": 10,
+                "sortable": true,
+                "fields": {
+                    "background_image": {
+                        "type": "image",
+                        "label": "Slide Background Image",
+                        "help": "Background image for this slide (1920x740px recommended)",
+                        "size": "1920x740px",
+                        "required": true
+                    }
+                }
+            }
+        }
+    },
+    "theme1_about_us": {
+        "builder": true,
+        "name": "Theme1 About Us Section",
+        "theme": "theme1",
+        "order": 2,
+        "page": "home",
+        "content": {
+            "sub_title": {
+                "type": "text",
+                "label": "Sub Title",
+                "required": true,
+                "help": "Sub title with HTML formatting"
+            },
+            "title": {
+                "type": "text",
+                "label": "Main Title",
+                "required": true,
+                "help": "Main title with HTML formatting"
+            },
+            "description": {
+                "type": "textarea",
+                "label": "Description",
+                "help": "Brief description below the heading",
+                "maxlength": 200
+            },
+            "button_text": {
+                "type": "text",
+                "label": "Button Text",
+                "help": "Text to display on the call-to-action button"
+            },
+            "button_url": {
+                "type": "text",
+                "label": "Button URL",
+                "help": "URL for the call-to-action button"
+            },
+            "center_image": {
+                "type": "image",
+                "label": "Center Image",
+                "help": "Image for the center of section (235x80px recommended)",
+                "size": "235x80px",
+                "inline": true
+            },
+            "left_top_image": {
+                "type": "image",
+                "label": "Left Top Image",
+                "help": "Image for the left top of section (288x203px recommended)",
+                "size": "288x203px",
+                "inline": true
+            },
+            "left_bottom_image": {
+                "type": "image",
+                "label": "Left Bottom Image",
+                "help": "Image for the left bottom of section (177x137px recommended)",
+                "size": "177x137px",
+                "inline": true
+            },
+            "right_top_image": {
+                "type": "image",
+                "label": "Right Top Image",
+                "help": "Image for the right top of section (290x203px recommended)",
+                "size": "290x203px",
+                "inline": true
+            },
+            "right_bottom_image": {
+                "type": "image",
+                "label": "Right Bottom Image",
+                "help": "Image for the right bottom of section (180x137px recommended)",
+                "size": "180x137px",
+                "inline": true
+            }
+        }
+    },
+    "theme1_tour_package": {
+        "builder": true,
+        "name": "Theme1 Tour Package Section",
+        "theme": "theme1",
+        "order": 3,
+        "page": "home",
+        "content": {
+            "sub_title": {
+                "type": "text",
+                "label": "Sub Title",
+                "required": true,
+                "help": "Sub title with HTML formatting"
+            },
+            "title": {
+                "type": "text",
+                "label": "Main Title",
+                "required": true,
+                "help": "Main title with HTML formatting"
+            }
+        }
+    },
+    "theme1_why_choose_us": {
+        "builder": true,
+        "name": "Theme1 Why Choose Section",
+        "theme": "theme1",
+        "order": 4,
+        "page": "home",
+        "content": {
+            "right_side_title": {
+                "type": "text",
+                "label": "Right Side Title",
+                "help": "Sub title with HTML formatting"
+            },
+            "sub_title": {
+                "type": "text",
+                "label": "Sub Title",
+                "required": true,
+                "help": "Sub title with HTML formatting"
+            },
+            "title": {
+                "type": "text",
+                "label": "Main Title",
+                "required": true,
+                "help": "Main title with HTML formatting"
+            },
+            "description": {
+                "type": "textarea",
+                "label": "Description",
+                "help": "Brief description below the heading",
+                "maxlength": 200
+            },
+            "button_text": {
+                "type": "text",
+                "label": "Button Text",
+                "help": "Text to display on the call-to-action button"
+            },
+            "button_url": {
+                "type": "text",
+                "label": "Button URL",
+                "help": "URL for the call-to-action button"
+            },
+            "slides": {
+                "type": "repeater",
+                "label": "Slider Items",
+                "min": 1,
+                "max": 3,
+                "sortable": true,
+                "fields": {
+                    "title": {
+                        "type": "text",
+                        "label": "Slide Title",
+                        "help": "Title for this slide",
+                        "required": true
+                    },
+                    "sub_title": {
+                        "type": "text",
+                        "label": "Slide Sub Title",
+                        "help": "Sub Title for this slide",
+                        "required": true
+                    },
+                    "image": {
+                        "type": "image",
+                        "label": "Slide Image",
+                        "help": "Image for this slide (65x65px recommended)",
+                        "size": "65x65px",
+                        "required": true
+                    }
+                }
+            },
+            "small_image": {
+                "type": "image",
+                "label": "Small Image",
+                "help": "Small image of the section (300x300px recommended)",
+                "size": "300x300px",
+                "inline": true
+            },
+            "large_image": {
+                "type": "image",
+                "label": "Large Image",
+                "help": "Large image of the section (450x550px recommended)",
+                "size": "450x550px",
+                "inline": true
+            }
+        }
+    },
+    "theme1_banner": {
+        "builder": true,
+        "name": "Theme1 Banner Section",
+        "theme": "theme1",
+        "order": 5,
+        "page": "home",
+        "content": {
+            "sub_title": {
+                "type": "text",
+                "label": "Sub Title",
+                "required": true,
+                "help": "Sub title with HTML formatting"
+            },
+            "title": {
+                "type": "text",
+                "label": "Main Title",
+                "required": true,
+                "help": "Main title with HTML formatting"
+            },
+            "button_text": {
+                "type": "text",
+                "label": "Button Text",
+                "help": "Text to display on the call-to-action button"
+            },
+            "button_url": {
+                "type": "text",
+                "label": "Button URL",
+                "help": "URL for the call-to-action button"
+            },
+            "background_image": {
+                "type": "image",
+                "label": "Background Image",
+                "help": "Background image for the section (674x280px recommended)",
+                "size": "674x280px",
+                "inline": true
+            },
+            "youtube_video_link": {
+                "type": "text",
+                "label": "Youtube Video Link",
+                "help": "Youtube video link for the section"
+            }
+        }
+    },
+    "theme1_destination": {
+        "builder": true,
+        "name": "Theme1 Destination Section",
+        "theme": "theme1",
+        "order": 6,
+        "page": "home",
+        "content": {
+            "sub_title": {
+                "type": "text",
+                "label": "Sub Title",
+                "required": true,
+                "help": "Sub title with HTML formatting"
+            },
+            "title": {
+                "type": "text",
+                "label": "Main Title",
+                "required": true,
+                "help": "Main title with HTML formatting"
+            },
+            "description": {
+                "type": "textarea",
+                "label": "Description",
+                "required": true,
+                "help": "Brief description below the heading"
+            }
+        }
+    },
+    "theme1_banner_2": {
+        "builder": true,
+        "name": "Theme1 Banner 2 Section",
+        "theme": "theme1",
+        "order": 7,
+        "page": "home",
+        "content": {
+            "sub_title": {
+                "type": "text",
+                "label": "Sub Title",
+                "required": true,
+                "help": "Sub title with HTML formatting"
+            },
+            "title": {
+                "type": "text",
+                "label": "Main Title",
+                "required": true,
+                "help": "Main title with HTML formatting"
+            },
+            "big_title": {
+                "type": "text",
+                "label": "Big Title",
+                "help": "Main title with HTML formatting"
+            },
+            "button_text": {
+                "type": "text",
+                "label": "Button Text",
+                "help": "Text to display on the button"
+            },
+            "button_url": {
+                "type": "text",
+                "label": "Button URL",
+                "help": "URL for the button"
+            },
+            "background_image": {
+                "type": "image",
+                "label": "Background Image",
+                "help": "Background image for the section (1920x900px recommended)",
+                "size": "1920x900px"
+            }
+        }
+    },
+    "theme1_testimonial": {
+        "builder": true,
+        "name": "Theme1 Testimonial Section",
+        "theme": "theme1",
+        "order": 8,
+        "page": "home",
+        "content": {
+            "sub_title": {
+                "type": "text",
+                "label": "Sub Title",
+                "required": true,
+                "help": "Sub title with HTML formatting"
+            },
+            "title": {
+                "type": "text",
+                "label": "Main Title",
+                "required": true,
+                "help": "Main title with HTML formatting"
+            },
+            "description": {
+                "type": "textarea",
+                "label": "Button Text",
+                "help": "Brief description below the heading"
+            }
+        }
+    },
+    "theme1_blog": {
+        "builder": true,
+        "name": "Theme1 Blog Section",
+        "theme": "theme1",
+        "order": 9,
+        "page": "home",
+        "content": {
+            "sub_title": {
+                "type": "text",
+                "label": "Sub Title",
+                "required": true,
+                "help": "Sub title with HTML formatting"
+            },
+            "title": {
+                "type": "text",
+                "label": "Main Title",
+                "required": true,
+                "help": "Main title with HTML formatting"
+            },
+            "description": {
+                "type": "textarea",
+                "label": "Button Text",
+                "help": "Brief description below the heading"
+            }
+        }
+    },
+    "theme1_cta": {
+        "builder": true,
+        "name": "CTA Section",
+        "theme": "theme1",
+        "order": 10,
+        "page": "home",
+        "content": {
+            "image": {
+                "type": "image",
+                "label": "Call to Action Image",
+                "help": "Call to action image (280x200px recommended)",
+                "size": "280X200px"
+            },
+            "sub_title": {
+                "type": "text",
+                "label": "Call to Action Subtitle",
+                "required": true,
+                "help": "Call to action subtitle"
+            },
+            "title": {
+                "type": "text",
+                "label": "Call to Action Title",
+                "help": "Call to action title",
+                "required": true
+            },
+            "apple_store_link": {
+                "type": "text",
+                "label": "Apple Store Link",
+                "help": "Apple store link"
+            },
+            "google_play_link": {
+                "type": "text",
+                "label": "Google Play Link",
+                "help": "Google play link"
+            }
+        }
+    }
+}

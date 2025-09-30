@@ -1,0 +1,11 @@
+{
+    "name": "TourBooking",
+    "alias": "tourbooking",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\TourBooking\\App\\Providers\\TourBookingServiceProvider"
+    ],
+    "files": []
+}

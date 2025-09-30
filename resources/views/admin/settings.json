@@ -1,0 +1,485 @@
+{
+    "social_links": {
+        "name": "Social Links",
+        "common": true,
+        "order": 1,
+        "page": "global",
+        "element": {
+            "icon": {
+                "type": "text",
+                "label": "Icon Class",
+                "required": true,
+                "help": "FontAwesome icon class (e.g., fab fa-facebook)"
+            },
+            "url": {
+                "type": "url",
+                "label": "URL",
+                "required": true,
+                "help": "Link to social media profile"
+            },
+            "name": {
+                "type": "text",
+                "label": "Platform Name",
+                "required": true,
+                "help": "Name of the social media platform"
+            }
+        }
+    },
+    "seo": {
+        "name": "SEO Settings",
+        "common": true,
+        "order": 4,
+        "page": "global",
+        "content": {
+            "meta_title": {
+                "type": "text",
+                "label": "Default Meta Title",
+                "required": true,
+                "help": "Global meta title for SEO"
+            },
+            "meta_description": {
+                "type": "textarea",
+                "label": "Default Meta Description",
+                "help": "Global meta description for SEO",
+                "rows": 3,
+                "maxlength": 160
+            },
+            "meta_keywords": {
+                "type": "textarea",
+                "label": "Default Meta Keywords",
+                "help": "Global meta keywords for SEO",
+                "rows": 2
+            },
+            "og_image": {
+                "type": "image",
+                "label": "Default OG Image",
+                "help": "Image used when sharing on social media",
+                "size": "1200x630px"
+            }
+        }
+    },
+    "about_page_about_section": {
+        "name": "About Page About Section",
+        "common": true,
+        "order": 6,
+        "page": "global",
+        "content": {
+            "section_subtitle": {
+                "type": "text",
+                "label": "Section Subtitle",
+                "help": "Sub title of section"
+            },
+            "section_title": {
+                "type": "text",
+                "label": "Section Title",
+                "required": true,
+                "help": "Main title of the section"
+            },
+            "section_description": {
+                "type": "textarea",
+                "label": "Section Description",
+                "required": true,
+                "help": "Description of the section"
+            },
+            "section_button_text": {
+                "type": "text",
+                "label": "Section Button Text",
+                "required": true,
+                "help": "Text to display on the call-to-action button"
+            },
+            "section_button_link": {
+                "type": "text",
+                "label": "Section Button Link",
+                "required": true,
+                "help": "Link to display on the call-to-action button"
+            },
+            "about_image_one": {
+                "type": "image",
+                "label": "About Image One",
+                "help": "Image for about section (290x195px recommended)",
+                "size": "290x195px"
+            },
+            "about_image_two": {
+                "type": "image",
+                "label": "About Image Two",
+                "help": "Image for about section (290x286px recommended)",
+                "size": "290x286px"
+            },
+            "about_image_three": {
+                "type": "image",
+                "label": "About Image Three",
+                "help": "Image for about section (290x330px recommended)",
+                "size": "290x330px"
+            }
+        }
+    },
+    "about_page_what_we_do": {
+        "name": "About Page What We Do Section",
+        "common": true,
+        "order": 7,
+        "page": "global",
+        "content": {
+            "section_subtitle": {
+                "type": "text",
+                "label": "Section Subtitle",
+                "help": "Sub title of the section"
+            },
+            "section_title": {
+                "type": "text",
+                "label": "Section Title",
+                "required": true,
+                "help": "Main title of the section"
+            },
+            "section_description": {
+                "type": "textarea",
+                "label": "Section Description",
+                "required": true,
+                "help": "Description of the section"
+            },
+            "slides": {
+                "type": "repeater",
+                "label": "Services Items",
+                "min": 1,
+                "max": 10,
+                "sortable": true,
+                "fields": {
+                    "image": {
+                        "type": "image",
+                        "label": "Upload image",
+                        "required": false,
+                        "size": "40x40px",
+                        "help": "Image for service item (40x40px recommended)"
+                    },
+                    "title": {
+                        "type": "text",
+                        "label": "Service item title",
+                        "required": true
+                    },
+                    "description": {
+                        "type": "textarea",
+                        "label": "Service item description",
+                        "required": true
+                    }
+                }
+            }
+        }
+    },
+    "about_page_cta": {
+        "name": "About Page Call to Action",
+        "common": true,
+        "order": 8,
+        "page": "global",
+        "content": {
+            "section_bg_image": {
+                "type": "image",
+                "label": "Background Image",
+                "help": "Background image for call-to-action section (1920x1080px recommended)",
+                "size": "1920x1160px",
+                "required": true
+            },
+            "section_subtitle": {
+                "type": "text",
+                "label": "Subtitle",
+                "help": "Sub title of the section"
+            },
+            "section_title": {
+                "type": "text",
+                "label": "Title",
+                "required": true,
+                "help": "Main title of the section"
+            },
+            "section_big_title": {
+                "type": "text",
+                "label": "Big Title",
+                "help": "Main big title of the section"
+            },
+            "section_description": {
+                "type": "textarea",
+                "label": "Description",
+                "help": "Description of the section"
+            },
+            "section_button_text": {
+                "type": "text",
+                "label": "Button Text",
+                "required": true,
+                "help": "Text to display on the call-to-action button"
+            },
+            "section_button_link": {
+                "type": "text",
+                "label": "Button Link",
+                "required": true,
+                "help": "Link to display on the call-to-action button"
+            }
+        }
+    },
+    "faq_section": {
+        "name": "Faq Section",
+        "common": true,
+        "order": 9,
+        "page": "global",
+        "content": {
+            "section_subtitle": {
+                "type": "text",
+                "label": "Section Subtitle",
+                "help": "Sub title of section",
+                "required": true
+            },
+            "section_title": {
+                "type": "text",
+                "label": "Section Title",
+                "required": true,
+                "help": "Main title of the section"
+            },
+            "slides": {
+                "type": "repeater",
+                "label": "Faq Items",
+                "min": 1,
+                "max": 10,
+                "sortable": true,
+                "fields": {
+                    "title": {
+                        "type": "text",
+                        "label": "Slide Title",
+                        "required": true
+                    },
+                    "description": {
+                        "type": "textarea",
+                        "label": "Slide Description",
+                        "required": true
+                    }
+                }
+            }
+        }
+    },
+    "footer_cta": {
+        "name": "CTA",
+        "common": true,
+        "order": 10,
+        "page": "global",
+        "content": {
+            "image": {
+                "type": "image",
+                "label": "Call to Action Image",
+                "help": "Call to action image (280x200px recommended)",
+                "size": "280X200px"
+            },
+            "sub_title": {
+                "type": "text",
+                "label": "Call to Action Subtitle",
+                "required": true,
+                "help": "Call to action subtitle"
+            },
+            "title": {
+                "type": "text",
+                "label": "Call to Action Title",
+                "help": "Call to action title",
+                "required": true
+            },
+            "apple_store_link": {
+                "type": "text",
+                "label": "Apple Store Link",
+                "help": "Apple store link"
+            },
+            "google_play_link": {
+                "type": "text",
+                "label": "Google Play Link",
+                "help": "Google play link"
+            }
+        }
+    },
+    "pricing_heading_section": {
+        "builder": true,
+        "name": "Pricing Heading Section",
+        "common": true,
+        "order": 1,
+        "page": "pricing",
+        "content": {
+            "sub_title": {
+                "type": "text",
+                "label": "Sub Title",
+                "required": true,
+                "help": "Sub title with HTML formatting"
+            },
+            "title": {
+                "type": "text",
+                "label": "Main Title",
+                "required": true,
+                "help": "Main title with HTML formatting"
+            }
+        }
+    },
+    "basic_package_plan": {
+        "name": "Basic Package Plan",
+        "common": true,
+        "order": 2,
+        "page": "pricing",
+        "content": {
+            "title": {
+                "type": "text",
+                "label": "Title",
+                "help": "Package title",
+                "required": true
+            },
+            "short_description": {
+                "type": "text",
+                "label": "Short Description",
+                "help": "Package short description",
+                "required": true
+            },
+            "price": {
+                "type": "number",
+                "label": "Price",
+                "help": "Price of the package",
+                "required": true
+            },
+            "time_period": {
+                "type": "text",
+                "label": "Time Period",
+                "help": "Time period of the package",
+                "required": true
+            },
+            "button_text": {
+                "type": "text",
+                "label": "Button Text",
+                "help": "Button text of the package",
+                "required": true
+            },
+            "button_url": {
+                "type": "text",
+                "label": "Button Url",
+                "help": "Button url of the package",
+                "required": true
+            },
+            "slides": {
+                "type": "repeater",
+                "label": "Package Items",
+                "min": 1,
+                "max": 10,
+                "sortable": true,
+                "fields": {
+                    "title": {
+                        "type": "text",
+                        "label": "Feature Title",
+                        "required": true
+                    }
+                }
+            }
+        }
+    },
+    "standard_package_plan": {
+        "name": "Standard Package Plan",
+        "common": true,
+        "order": 3,
+        "page": "pricing",
+        "content": {
+            "title": {
+                "type": "text",
+                "label": "Title",
+                "help": "Package title",
+                "required": true
+            },
+            "short_description": {
+                "type": "text",
+                "label": "Short Description",
+                "help": "Package short description",
+                "required": true
+            },
+            "price": {
+                "type": "number",
+                "label": "Price",
+                "help": "Price of the package",
+                "required": true
+            },
+            "time_period": {
+                "type": "text",
+                "label": "Time Period",
+                "help": "Time period of the package",
+                "required": true
+            },
+            "button_text": {
+                "type": "text",
+                "label": "Button Text",
+                "help": "Button text of the package",
+                "required": true
+            },
+            "button_url": {
+                "type": "text",
+                "label": "Button Url",
+                "help": "Button url of the package",
+                "required": true
+            },
+            "slides": {
+                "type": "repeater",
+                "label": "Package Items",
+                "min": 1,
+                "max": 10,
+                "sortable": true,
+                "fields": {
+                    "title": {
+                        "type": "text",
+                        "label": "Feature Title",
+                        "required": true
+                    }
+                }
+            }
+        }
+    },
+    "cooperate_package_plan": {
+        "name": "Cooperate Package Plan",
+        "common": true,
+        "order": 4,
+        "page": "pricing",
+        "content": {
+            "title": {
+                "type": "text",
+                "label": "Title",
+                "help": "Package title",
+                "required": true
+            },
+            "short_description": {
+                "type": "text",
+                "label": "Short Description",
+                "help": "Package short description",
+                "required": true
+            },
+            "price": {
+                "type": "number",
+                "label": "Price",
+                "help": "Price of the package",
+                "required": true
+            },
+            "time_period": {
+                "type": "text",
+                "label": "Time Period",
+                "help": "Time period of the package",
+                "required": true
+            },
+            "button_text": {
+                "type": "text",
+                "label": "Button Text",
+                "help": "Button text of the package",
+                "required": true
+            },
+            "button_url": {
+                "type": "text",
+                "label": "Button Url",
+                "help": "Button url of the package",
+                "required": true
+            },
+            "slides": {
+                "type": "repeater",
+                "label": "Package Items",
+                "min": 1,
+                "max": 10,
+                "sortable": true,
+                "fields": {
+                    "title": {
+                        "type": "text",
+                        "label": "Feature Title",
+                        "required": true
+                    }
+                }
+            }
+        }
+    }
+}

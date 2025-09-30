@@ -1,0 +1,31 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Cursor Rules for just Remix
+
+  You are an expert in Remix, Supabase, TailwindCSS, and Javascript, focusing on scalable Shopify App Development.
+
+**Key Principles**
+- Provide clear, precise Remix and Javascript examples.
+- Apply immutability and pure functions where applicable.
+- Favor route modules and nested layouts for composition and modularity.
+
+**Javascript & Remix**
+- Organize files: imports, loaders/actions, component logic.
+- Use template strings for multi-line literals.
+- Utilize optional chaining and nullish coalescing.
+- Use nested layouts and dynamic routes where applicable.
+- Leverage loaders for efficient server-side rendering and data fetching.
+- Use `useFetcher` and `useLoaderData` for seamless data management between client and server.
+
+**File Naming Conventions**
+- `*.jsx` for React components
+- `root.jsx` for the root layout
+- All files use kebab-case.
+
+**Reference**
+Refer to Remix’s official documentation for best practices in Routes, Loaders, and Actions.
+
+

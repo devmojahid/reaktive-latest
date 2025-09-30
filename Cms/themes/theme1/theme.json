@@ -1,0 +1,57 @@
+{
+    "id": "tourex/theme1",
+    "name": "Theme One",
+    "namespace": "Theme\\Theme1\\",
+    "author": "Alucard Group",
+    "url": null,
+    "version": "1.0.0",
+    "description": "The default theme for Pirate Trips",
+    "screenshot": "screenshot.png",
+    "required_plugins": [],
+    "features": [
+        "Responsive Design",
+        "Custom Header",
+        "Custom Footer",
+        "Theme Switcher",
+        "Breadcrumbs",
+        "Social Media Integration",
+        "Widget Areas",
+        "Custom Navigation",
+        "User Authentication",
+        "SEO Optimized"
+    ],
+    "customization": {
+        "colors": {
+            "primary": "#3490dc",
+            "secondary": "#38c172",
+            "dark": "#343a40",
+            "light": "#f8f9fa"
+        },
+        "fonts": {
+            "primary": "'Arial', sans-serif",
+            "secondary": "'Helvetica', sans-serif"
+        },
+        "layout": {
+            "container_width": "1200px",
+            "sidebar_width": "300px"
+        }
+    },
+    "menu_locations": {
+        "primary_menu": {
+            "name": "Primary Menu",
+            "description": "Header navigation menu"
+        },
+        "footer_menu_1": {
+            "name": "Footer Menu 1",
+            "description": "Footer column 1 navigation"
+        },
+        "footer_menu_2": {
+            "name": "Footer Menu 2",
+            "description": "Footer column 2 navigation"
+        },
+        "mobile_menu": {
+            "name": "Mobile Menu",
+            "description": "Mobile navigation menu"
+        }
+    }
+}

@@ -1,0 +1,355 @@
+@extends('agency.master_layout')
+@section('title')
+    <title>{{ __('translate.Create Destination') }}</title>
+@endsection
+
+@section('body-header')
+    <h3 class="crancy-header__title m-0">{{ __('translate.Create Destination') }}</h3>
+    <p class="crancy-header__text">{{ __('translate.Tour Booking') }} >> {{ __('translate.Create Destination') }}</p>
+@endsection
+
+@push('style_section')
+    <link rel="stylesheet" href="{{ asset('global/select2/select2.min.css') }}">
+    <style>
+        /* Currency Input Field Styling */
+        .crancy__item-form--currency {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .crancy__item-form--currency .crancy__item-input {
+            width: 100%;
+            padding-right: 40px;
+            /* Add space for the currency icon */
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px 40px 10px 12px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .crancy__item-form--currency .crancy__item-input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        .crancy__currency-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            /* Prevents icon from interfering with input clicks */
+            z-index: 2;
+        }
+
+        .crancy__currency-icon span {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        /* Optional: Style for better visual hierarchy */
+        .crancy__item-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .mg-top-form-20 {
+            margin-top: 20px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .crancy__item-form--currency .crancy__item-input {
+                padding-right: 35px;
+            }
+
+            .crancy__currency-icon {
+                right: 10px;
+            }
+
+            .crancy__currency-icon span {
+                font-size: 13px;
+            }
+        }
+    </style>
+@endpush
+
+
+
+@section('body-content')
+    <section class="crancy-adashboard crancy-show">
+        <div class="container container__bscreen">
+            <div class="row">
+                <div class="col-12">
+                    <div class="crancy-body">
+                        <div class="crancy-dsinner">
+                            <form action="{{ route('agency.tourbooking.destinations.store') }}" method="POST"
+                                enctype="multipart/form-data">
+                                @csrf
+                                <div class="row">
+                                    <div class="col-12 mg-top-30">
+                                        <div class="crancy-product-card">
+                                            <div class="create_new_btn_inline_box">
+                                                <h4 class="crancy-product-card__title">
+                                                    {{ __('translate.Basic Information') }}</h4>
+                                                <a href="{{ route('agency.tourbooking.destinations.index') }}"
+                                                    class="crancy-btn"><i class="fa fa-list"></i>
+                                                    {{ __('translate.Destination List') }}</a>
+                                            </div>
+
+                                            <div class="row mg-top-30">
+                                                <div class="col-lg-6 col-md-6 col-12">
+                                                    <div class="crancy__item-form--group mg-top-form-20">
+                                                        <label class="crancy__item-label">{{ __('translate.Name') }}
+                                                            *</label>
+                                                        <input class="crancy__item-input" type="text" name="name"
+                                                            id="name" value="{{ old('name') }}" required>
+                                                        @error('name')
+                                                            <span class="text-danger">{{ $message }}</span>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-6 col-md-6 col-12">
+                                                    <div class="crancy__item-form--group mg-top-form-20">
+                                                        <label class="crancy__item-label">{{ __('translate.Slug') }}
+                                                            *</label>
+                                                        <input required class="crancy__item-input" type="text"
+                                                            name="slug" id="slug" value="{{ old('slug') }}">
+                                                        @error('slug')
+                                                            <span class="text-danger">{{ $message }}</span>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-6 col-md-6 col-12">
+                                                    <div class="crancy__item-form--group mg-top-form-20">
+                                                        <label
+                                                            class="crancy__item-label">{{ __('translate.Country') }}*</label>
+                                                        <input required class="crancy__item-input" type="text" name="country"
+                                                            id="country" value="{{ old('country') }}">
+                                                        @error('country')
+                                                            <span class="text-danger">{{ $message }}</span>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+
+
+                                                <div class="col-12">
+                                                    <div class="crancy__item-form--group mg-top-form-20">
+                                                        <label
+                                                            class="crancy__item-label">{{ __('translate.Destination tags') }}</label>
+                                                        <input placeholder="{{ __('translate.Separator by comma. Ex: 01 Tour, 02 Hotel') }}"
+                                                            class="crancy__item-input" type="text" name="tags"
+                                                            id="tags" value="{{ old('tags') }}">
+                                                        @error('tags')
+                                                            <span class="text-danger">{{ $message }}</span>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-12">
+                                                    <div class="crancy__item-form--group mg-top-form-20">
+                                                        <label
+                                                            class="crancy__item-label">{{ __('translate.Description') }}</label>
+                                                        <textarea class="crancy__item-input summernote" name="description" rows="6">{{ old('description') }}</textarea>
+                                                        @error('description')
+                                                            <span class="text-danger">{{ $message }}</span>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row mg-top-30">
+                                                <div class="col-sm-2">
+                                                    <div class="crancy__item-form--group mg-top-form-20">
+                                                        <label
+                                                            class="crancy__item-label">{{ __('translate.Status') }}</label>
+                                                        <div
+                                                            class="crancy-ptabs__notify-switch crancy-ptabs__notify-switch--two">
+                                                            <label class="crancy__item-switch">
+                                                                <input name="status" type="checkbox" checked
+                                                                    value="1">
+                                                                <span
+                                                                    class="crancy__item-switch--slide crancy__item-switch--round"></span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="crancy__item-form--group mg-top-form-20">
+                                                        <label class="crancy__item-label">{{ __('translate.Featured') }}
+                                                            *</label>
+                                                        <div
+                                                            class="crancy-ptabs__notify-switch crancy-ptabs__notify-switch--two">
+                                                            <label class="crancy__item-switch">
+                                                                <input type="checkbox" class="custom-control-input"
+                                                                    id="is_featured" name="is_featured" value="1"
+                                                                    {{ old('is_featured') ? 'checked' : '' }}>
+                                                                <span
+                                                                    class="crancy__item-switch--slide crancy__item-switch--round"></span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-5">
+                                                    <div class="crancy__item-form--group w-100 h-100">
+                                                        <label
+                                                            class="crancy__item-label">{{ __('translate.SVG Image') }}</label>
+                                                        <div
+                                                            class="crancy-product-card__upload crancy-product-card__upload--border">
+                                                            <input accept="image/*" type="file" class="btn-check"
+                                                                name="svg" id="svg_img" autocomplete="off"
+                                                                onchange="previewImageSVG(event)">
+                                                            <label class="crancy-image-video-upload__label"
+                                                                for="svg_img">
+                                                                <img id="view_img_svg"
+                                                                    src="{{ isset($destination) && $destination->svg ? asset($destination->svg) : asset($general_setting->placeholder_image) }}">
+                                                                <h4 class="crancy-image-video-upload__title">
+                                                                    {{ __('translate.Click here to') }}
+                                                                    <span
+                                                                        class="crancy-primary-color">{{ __('translate.Choose File') }}</span>
+                                                                    {{ __('translate.and upload') }}
+                                                                </h4>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-5">
+                                                    <div class="crancy__item-form--group w-100 h-100">
+                                                        <label
+                                                            class="crancy__item-label">{{ __('translate.Featured Image') }}
+                                                            * </label>
+                                                        <div
+                                                            class="crancy-product-card__upload crancy-product-card__upload--border">
+                                                            <input required accept="image/*" type="file" class="btn-check"
+                                                                name="image" id="input-img1" autocomplete="off"
+                                                                onchange="previewImage(event)">
+                                                            <label class="crancy-image-video-upload__label"
+                                                                for="input-img1">
+                                                                <img id="view_img"
+                                                                    src="{{ isset($destination) && $destination->image ? asset($destination->image) : asset($general_setting->placeholder_image) }}">
+                                                                <h4 class="crancy-image-video-upload__title">
+                                                                    {{ __('translate.Click here to') }}
+                                                                    <span
+                                                                        class="crancy-primary-color">{{ __('translate.Choose File') }}</span>
+                                                                    {{ __('translate.and upload') }}
+                                                                </h4>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 mg-top-30">
+                                        <div class="crancy-product-card">
+                                            <h4 class="crancy-product-card__title">{{ __('translate.SEO Information') }}
+                                            </h4>
+
+                                            <div class="row mg-top-30">
+                                                <div class="col-12">
+                                                    <div class="crancy__item-form--group mg-top-form-20">
+                                                        <label
+                                                            class="crancy__item-label">{{ __('translate.SEO Title') }}</label>
+                                                        <input class="crancy__item-input" type="text"
+                                                            name="meta_title" value="{{ old('meta_title') }}">
+                                                        @error('meta_title')
+                                                            <span class="text-danger">{{ $message }}</span>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-12">
+                                                    <div class="crancy__item-form--group mg-top-form-20">
+                                                        <label
+                                                            class="crancy__item-label">{{ __('translate.SEO Description') }}</label>
+                                                        <textarea class="crancy__item-input summernote" name="meta_description" rows="3">{{ old('meta_description') }}</textarea>
+                                                        @error('meta_description')
+                                                            <span class="text-danger">{{ $message }}</span>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 mg-top-30">
+                                        <button class="crancy-btn"
+                                            type="submit">{{ __('translate.Create Destination') }}
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+@endsection
+
+@push('js_section')
+    <script src="{{ asset('global/select2/select2.min.js') }}"></script>
+    <script src="{{ asset('global/tinymce/js/tinymce/tinymce.min.js') }}"></script>
+
+    <script>
+        (function($) {
+            "use strict"
+            $(document).ready(function() {
+                $("#name").on("keyup", function(e) {
+                    let inputValue = $(this).val();
+                    let slug = inputValue.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+                    $("#slug").val(slug);
+                });
+
+                $('.select2').select2({
+                    tags: true,
+                    tokenSeparators: [',', ' ']
+                });
+
+                tinymce.init({
+                    selector: '.summernote',
+                    plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
+                    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+                    tinycomments_mode: 'embedded',
+                    tinycomments_author: 'Author name',
+                    mergetags_list: [{
+                            value: 'First.Name',
+                            title: 'First Name'
+                        },
+                        {
+                            value: 'Email',
+                            title: 'Email'
+                        },
+                    ]
+                });
+            });
+        })(jQuery);
+
+        function previewImage(event) {
+            var reader = new FileReader();
+            reader.onload = function() {
+                var output = document.getElementById('view_img');
+                output.src = reader.result;
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        };
+
+        function previewImageSVG(event) {
+            var reader = new FileReader();
+            reader.onload = function() {
+                var output = document.getElementById('view_img_svg');
+                output.src = reader.result;
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        };
+    </script>
+@endpush

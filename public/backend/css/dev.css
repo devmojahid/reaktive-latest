@@ -1,0 +1,374 @@
+/* ==========================================================================
+   SPARK ADMIN — BACKEND DEV.CSS (Full override)
+   Only requirement kept: brand color #ff4200
+   ========================================================================== */
+
+/* ---------- 0) Fonts (păstrăm setup-ul existent) ---------- */
+@font-face{font-family:"Euclid Circular A";src:url("../fonts/euclid-circular-a/EuclidCircularARegular.ttf") format("truetype");font-weight:400;font-style:normal}
+@font-face{font-family:"Euclid Circular A";src:url("../fonts/euclid-circular-a/EuclidCircularAMedium.ttf") format("truetype");font-weight:500;font-style:normal}
+@font-face{font-family:"Euclid Circular A";src:url("../fonts/euclid-circular-a/EuclidCircularASemiBold.ttf") format("truetype");font-weight:600;font-style:normal}
+@font-face{font-family:"Euclid Circular A";src:url("../fonts/euclid-circular-a/EuclidCircularABold.ttf") format("truetype");font-weight:700;font-style:normal}
+
+@font-face{font-family:"Fredoka";src:url("../fonts/fredoka/static/Fredoka-Regular.ttf") format("truetype");font-weight:400;font-style:normal}
+@font-face{font-family:"Fredoka";src:url("../fonts/fredoka/static/Fredoka-Medium.ttf") format("truetype");font-weight:500;font-style:normal}
+@font-face{font-family:"Fredoka";src:url("../fonts/fredoka/static/Fredoka-SemiBold.ttf") format("truetype");font-weight:600;font-style:normal}
+@font-face{font-family:"Fredoka";src:url("../fonts/fredoka/static/Fredoka-Bold.ttf") format("truetype");font-weight:700;font-style:normal}
+
+@font-face{font-family:"Adobe Garamond Pro";src:url("../fonts/adobe-garamond-pro/AGaramondPro-Regular.otf") format("truetype");font-weight:400;font-style:normal}
+@font-face{font-family:"Adobe Garamond Pro";src:url("../fonts/adobe-garamond-pro/AGaramondPro-Bold.otf") format("truetype");font-weight:700;font-style:normal}
+
+/* ---------- 1) Design Tokens ---------- */
+:root{
+  /* Brand */
+  --brand:#ff4200;
+  --brand-50:#fff0e8; --brand-100:#ffd8c9; --brand-200:#ffb996; --brand-300:#ff9a63;
+  --brand-400:#ff7f38; --brand-500:#ff4200; --brand-600:#e53a00;
+
+  /* Greys */
+  --g-25:#fcfcfd; --g-50:#f7f7fb; --g-75:#f3f5f7; --g-100:#eef1f5; --g-200:#e6eaf0;
+  --g-300:#d8dee6; --g-400:#c3cad5; --g-500:#9aa3b2; --g-600:#6b7280; --g-700:#4b5563;
+  --g-800:#374151; --g-900:#111827;
+
+  /* Surfaces */
+  --surface:#ffffff; --border:#e9edf2; --focus:rgba(255,66,0,.35);
+
+  /* Radius & Shadow */
+  --r-xs:6px; --r-sm:10px; --r-md:12px; --r-lg:16px; --r-xl:20px; --r-pill:999px;
+  --shadow-1:0 1px 2px rgba(17,24,39,.05);
+  --shadow-2:0 4px 14px rgba(17,24,39,.08);
+
+  /* Typography */
+  --font:"Euclid Circular A", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --sidebar-font: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Euclid Circular A", sans-serif; /* sidebar separat */
+  --fs-xs:12px; --fs-sm:13px; --fs-md:14px; --fs-lg:16px; --fs-xl:18px; --fs-2xl:22px; --fs-3xl:28px;
+}
+
+/* ---------- 2) Base ---------- */
+html,body{font-family:var(--font);color:var(--g-800);background:#f8fafc}
+h1,h2,h3,h4,h5,h6{font-weight:600;color:var(--g-900);letter-spacing:.2px}
+h1{font-size:var(--fs-3xl)}h2{font-size:var(--fs-2xl)}h3{font-size:var(--fs-xl)}h4{font-size:var(--fs-lg)}h5{font-size:var(--fs-md)}h6{font-size:var(--fs-sm)}
+a{color:var(--brand-600);text-decoration:none}a:hover{color:var(--brand)}
+::selection{background:var(--brand-100)}
+img{max-width:100%;height:auto;border-radius:10px}
+.wrap,.crancy-body{overflow-x:hidden}
+
+/* ---------- 3) Header & Page Title ---------- */
+.logo{border-bottom:1px solid var(--border)}
+.ed-page-title-default{font-size:var(--fs-xl);font-weight:600;margin:20px 0;color:var(--g-900)}
+.crancy-header__right{gap:18px}
+.crancy-header__blink{border:1px solid var(--brand)!important}
+.crancy-header__author-img img{border-radius:999px;object-fit:cover}
+
+/* ======================================================================
+   4) SIDEBAR — new visual language (text, font, spacing, active/hover)
+   ====================================================================== */
+.admin-menu{
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  font-family:var(--sidebar-font); /* altă structură de font doar pt sidebar */
+}
+.admin-menu__title{
+  font-size:var(--fs-sm);
+  color:var(--g-700);
+  padding:14px 16px;
+  border-bottom:1px solid var(--border);
+  letter-spacing:.2px;
+}
+
+/* grupări subtitluri (“Experiences List”, “Product & Review”… ) */
+.crancy-psidebar__title,
+.menu-bar__group-title{
+  display:block;
+  font-family:var(--sidebar-font);
+  font-size:11px;
+  color:#808aa3;
+  letter-spacing:.5px;
+  text-transform:uppercase;
+  padding:12px 14px 6px 14px;
+}
+
+/* item de meniu — compact, modern */
+.crancy-dashboard-menu .menu-bar li a{
+  display:flex;align-items:center;gap:12px;
+  padding:11px 14px;
+  margin:4px 8px;
+  border-radius:12px;
+  color:#2b2f3a;
+  font-weight:600;
+  font-size:14.5px;
+  line-height:1.2;
+  transition:background .2s ease, color .2s ease, transform .06s ease, box-shadow .2s ease, border-color .2s ease;
+  border:1px solid transparent;
+}
+
+/* icon container (fără a schimba HTML) */
+.crancy-dashboard-menu .menu-bar li a .crancy-menu-icon,
+.crancy-dashboard-menu .menu-bar li a .crancy-svg-icon{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:28px;height:28px;min-width:28px;
+  border-radius:10px;
+  background:#fafbff;
+  color:#7b849c;
+  box-shadow:inset 0 0 0 1px #eef1f7;
+  font-size:18px;
+}
+
+/* text */
+.menu-bar li a .menu-bar__text{flex:1;letter-spacing:.1px}
+
+/* hover */
+.crancy-dashboard-menu .menu-bar li a:hover{
+  background:#fff;border-color:var(--border);box-shadow:var(--shadow-1);
+  color:#121826;
+}
+.crancy-dashboard-menu .menu-bar li a:hover .crancy-menu-icon,
+.crancy-dashboard-menu .menu-bar li a:hover .crancy-svg-icon{
+  background:var(--brand-50);color:var(--brand-600);box-shadow:inset 0 0 0 1px var(--brand-100)
+}
+
+/* active */
+.crancy-dashboard-menu li.active>a{
+  background:linear-gradient(180deg,#ffffff,#fbfbfe);
+  border-color:var(--brand-100);
+  box-shadow:0 1px 0 rgba(17,24,39,.03), var(--shadow-1);
+  color:#111827;
+  position:relative;
+}
+.crancy-dashboard-menu li.active>a:before{
+  content:"";position:absolute;left:-1px;top:6px;bottom:6px;width:3px;border-radius:3px;background:var(--brand);
+}
+.crancy-dashboard-menu li.active>a .crancy-menu-icon,
+.crancy-dashboard-menu li.active>a .crancy-svg-icon{
+  background:var(--brand-50);color:var(--brand-600);box-shadow:inset 0 0 0 1px var(--brand-100)
+}
+
+/* submeniuri */
+.menu-bar li .crancy__dropdown{
+  margin:2px 8px 8px 40px;
+  padding-left:14px;
+  border-left:1px dashed var(--border);
+}
+.menu-bar li ul li a{
+  padding:9px 10px;
+  margin:2px 0;
+  border-radius:10px;
+  color:#677089 !important;
+  font-weight:600;
+  font-size:13.5px;
+}
+.menu-bar li ul li a:hover{background:#fff;border:1px solid var(--border);color:#161b22 !important}
+.menu-bar li ul li a span{color:inherit !important}
+
+/* “collapsed” state vizual curat */
+.menu-bar li a.collapsed{color:#2b2f3a !important}
+.crancy-dashboard-menu .collapsed .crancy-menu-icon .crancy-svg-icon{color:#7b849c}
+
+/* highlight pentru link selectat în submenu (fără să schimbăm Blade) */
+.submenu_active{color:var(--brand)!important}
+
+/* ======================================================================
+   5) Cards (stat & generic) — păstrăm ce ți-a plăcut
+   ====================================================================== */
+.crancy-ecom-card,
+.card,.crancy-card,.crancy-table{
+  background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-1)
+}
+.crancy-ecom-card{padding:18px 20px}
+.crancy-ecom-card .stat-inline{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.crancy-ecom-card .stat-ico{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:12px;background:linear-gradient(180deg,#faf5ff,#fff);box-shadow:inset 0 0 0 1px var(--g-100);color:#7c3aed}
+.crancy-ecom-card .stat-label{font-size:var(--fs-sm);color:var(--g-600)}
+.crancy-ecom-card .stat-value{font-size:22px;font-weight:700;color:var(--g-900);background:#fff;display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:14px;border:1px solid var(--border);box-shadow:var(--shadow-1)}
+
+/* ======================================================================
+   6) Tables (DataTables) & chips
+   ====================================================================== */
+.crancy-table__main,table.dataTable{
+  width:100%;border-collapse:separate!important;border-spacing:0;background:var(--surface);
+  border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-1)
+}
+.crancy-table__main thead th,table.dataTable thead th{
+  background:linear-gradient(180deg,#fdfefe,#f7f9fb);border-bottom:1px solid var(--border);
+  color:var(--g-700);font-weight:600;font-size:var(--fs-sm);padding:14px 16px!important
+}
+.crancy-table__main tbody td,table.dataTable tbody td{
+  padding:14px 16px!important;font-size:var(--fs-md);color:var(--g-800);border-bottom:1px solid var(--g-100)
+}
+.crancy-table__body tr:hover{background:#f7faff!important}
+div.dataTables_wrapper div.dataTables_filter input{
+  height:42px;min-height:42px;border-radius:12px;border:1px solid var(--border);background:#fff;padding:0 12px;box-shadow:var(--shadow-1)
+}
+div.dataTables_wrapper div.dataTables_length select{
+  background:#fff!important;border:1px solid var(--border)!important;border-radius:10px;height:42px;min-height:42px;padding:0 10px;color:var(--g-800)
+}
+table.dataTable>thead .sorting:before,
+table.dataTable>thead .sorting_asc:before,
+table.dataTable>thead .sorting_desc:before,
+table.dataTable>thead .sorting_asc_disabled:before,
+table.dataTable>thead .sorting_desc_disabled:before{content:""!important}
+
+/* status chips */
+.bg-success{background:#e7f9ee!important;color:#137a3a!important;padding:8px 14px!important;border-radius:10px!important;font-weight:700!important}
+.bg-danger{background:#ffe9e9!important;color:#c0392b!important;padding:8px 14px!important;border-radius:10px!important;font-weight:700!important}
+.crancy-table__status.crancy-table__status--paid{background:#e7f9ee;color:#137a3a}
+
+/* ======================================================================
+   7) Forms (focus, dropdown text, cardify)
+   ====================================================================== */
+input[type="text"],input[type="email"],input[type="url"],input[type="password"],
+input[type="search"],input[type="number"],input[type="tel"],input[type="range"],
+input[type="date"],input[type="month"],input[type="week"],input[type="time"],
+input[type="datetime"],input[type="datetime-local"],input[type="color"],textarea,.form-control{
+  background:#fff!important;border:1px solid var(--border)!important;border-radius:12px;color:#111827;padding:12px 12px;box-shadow:var(--shadow-1)
+}
+input:focus,textarea:focus,.form-control:focus{outline:none;border-color:var(--brand-300)!important;box-shadow:0 0 0 4px var(--focus)!important;background:#fff!important}
+
+select,.form-select,.nice-select,.crancy-table-filter__single input{
+  background:#fff!important;border:1px solid var(--border)!important;color:#111827!important;border-radius:12px;min-height:42px
+}
+.form-select:focus{box-shadow:0 0 0 4px var(--focus)!important;border-color:var(--brand-300)!important}
+.nice-select .list{border:1px solid var(--border);box-shadow:var(--shadow-2);border-radius:12px}
+.nice-select .option{color:#111827}
+.nice-select .option:hover,.nice-select .option.focus,.nice-select .option.selected{background:#f7f9ff;color:#0f172a}
+
+.crancy-wc__form--middle,.form-section,.crancy-ptabs.edc-edit-course-body{background:#fff;border:1px solid var(--border);border-radius:16px;padding:24px;box-shadow:var(--shadow-1)}
+.crancy-wc__form-inner{padding:40px 32px 56px 32px}
+
+/* Switch */
+.custom-switch{width:50px;height:26px}
+.slider{background:#e5e7eb;border-radius:22px}
+.slider::before{height:20px;width:20px;left:3px;bottom:3px}
+input:checked+.slider{background:var(--brand)}
+.profile-switcher-wrapper{background:rgba(255,66,0,.08);padding:8px 12px;border-radius:var(--r-pill)}
+.profile-switcher-wrapper .text{color:var(--brand);font-weight:600}
+
+/* Uploader */
+.edu_support_files input[type=file]{border:1px dashed var(--brand-200)}
+.edu_support_files input[type=file]::file-selector-button{padding:10px 12px;background:var(--brand-50);border-radius:10px;border:1px solid var(--brand-100)}
+
+/* Tagify */
+.tagify tag>div{padding:2px 10px!important;color:#2b2f3a!important}
+.tagify__input{min-width:110px;margin:0!important;padding:0!important}
+
+/* Datepicker */
+.flatpickr-calendar.open{z-index:999999999!important}
+.flatpickr-months .flatpickr-month{height:108px!important}
+
+/* ======================================================================
+   8) Buttons
+   ====================================================================== */
+.btn-primary,.crancy-btn.edc-crs-step-save-btn{
+  background:var(--brand)!important;border:1px solid var(--brand-600)!important;color:#fff!important;
+  padding:12px 18px;border-radius:12px;font-weight:700;box-shadow:0 6px 16px rgba(255,66,0,.15)
+}
+.btn-primary:hover{background:var(--brand-600)!important}
+.btn-secondary,.btn-secondary:hover{background:#eef2f7!important;border:1px solid var(--border)!important;color:#111827!important}
+.crancy-btn{line-height:1.1;font-weight:700;padding:12px 18px;border-radius:12px}
+.crancy-btn.next-btn{background:transparent;border:1px solid var(--g-300);color:#111827}
+.btn-black{border:1px solid #111827;color:#111827;border-radius:12px}
+.delete_danger_btn{background:#ef4444!important;color:#fff!important}
+
+/* ======================================================================
+   9) Misc polish
+   ====================================================================== */
+.muted,.text-muted{color:var(--g-600)!important}
+.hr{height:1px;background:var(--border);margin:14px 0}
+.copy-to-clipboard{background:#22c55e!important;color:#fff!important}
+.user_edit_btn{background:#22c55e!important;color:#fff!important}
+.user_delete_btn{background:#ef4444!important;color:#fff!important}
+
+/* dimensions păstrate */
+.avatar{width:120px;height:120px}
+.faq_image{height:200px!important}
+.join_seller_img{height:500px!important}
+.car_gallery_image{height:160px;width:200px}
+.intro_imagee{width:500px!important}
+.intro_imagee2{height:350px!important}
+
+/* ======================================================================
+   10) Responsive
+   ====================================================================== */
+@media (max-width:1536px){ .crancy-wc__form-inner{padding:40px 24px 56px 24px} }
+@media (max-width:1280px){ .crancy-wc__banner{display:none!important}.crancy-wc__form--middle{justify-content:center} }
+@media (max-width:1024px){ .crancy-table{overflow-x:auto} }
+@media (max-width:768px){
+  .crancy-psidebar.edc-edit-course-sidebar .list-group a{flex-direction:column}
+  .crancy-psidebar.edc-edit-course-sidebar .list-group{overflow-x:auto;gap:12px}
+}
+@media (max-width:640px){
+  .crancy-table.crancy-table--v3{padding:15px}
+  .dataTables_wrapper .row:first-child{gap:10px}
+  .crancy-wc__form-inner{padding:28px 16px 40px 16px}
+}
+
+
+/* ===================== SIDEBAR ACTIVE PILL — FIX ===================== */
+/* 1) Toate item-urile primesc border-left transparent ca să nu sară layout-ul */
+.crancy-dashboard-menu .menu-bar li a{
+  border-left: 3px solid transparent;   /* rezervă spațiul pentru accent */
+  padding-left: 16px;                    /* mic spațiu între accent și icon */
+}
+
+/* 2) Starea activă: colorăm accentul; scoatem pseudo-ul ca să nu se suprapună */
+.crancy-dashboard-menu li.active > a{
+  border-left-color: var(--brand);
+  background: linear-gradient(180deg,#ffffff,#fbfbfe);
+  border-color: var(--brand-100);
+  box-shadow: 0 1px 0 rgba(17,24,39,.03), var(--shadow-1);
+}
+.crancy-dashboard-menu li.active > a::before{ content: none !important; }
+
+/* 3) Ușor “air” pentru icon ca să nu pară lipit de accent */
+.crancy-dashboard-menu .menu-bar li a .crancy-menu-icon,
+.crancy-dashboard-menu .menu-bar li a .crancy-svg-icon{
+  margin-left: 2px;   /* subtil, dar ajută vizual */
+}
+
+/* 4) Hover rămâne curat și nu atinge accentul */
+.crancy-dashboard-menu .menu-bar li a:hover{
+  border-left-color: var(--brand-100);
+}
+
+
+/* --- KPI icons: force brand color over any inline fills/strokes --- */
+.crancy-ecom-card__v2 .flex-main > span svg{
+  /* păstrăm fundalul chip-ului și setăm culoarea „currentColor” pe svg */
+  color: var(--brand);
+}
+
+/* orice element cu stroke devine brand */
+.crancy-ecom-card__v2 .flex-main > span svg [stroke]{
+  stroke: currentColor !important;
+}
+
+/* orice element cu fill, dar NU fill="none", devine brand */
+.crancy-ecom-card__v2 .flex-main > span svg [fill]:not([fill="none"]){
+  fill: currentColor !important;
+}
+
+/* dacă iconul e doar fill (fără stroke) acoperim și cazul general */
+.crancy-ecom-card__v2 .flex-main > span svg path:not([fill="none"]),
+.crancy-ecom-card__v2 .flex-main > span svg rect:not([fill="none"]),
+.crancy-ecom-card__v2 .flex-main > span svg circle:not([fill="none"]),
+.crancy-ecom-card__v2 .flex-main > span svg polygon:not([fill="none"]) {
+  fill: currentColor !important;
+}
+
+
+/* --- FIX: sidebar default link color & active state --- */
+.sidebar .menu-link,
+.admin-menu__one .menu-bar__one .menu-bar__text .menu-bar__name {
+  color: #2b3640;           /* gri implicit, nu brand */
+}
+
+.sidebar .menu-item.is-active > .menu-link,
+.sidebar .menu-item > .menu-link:hover,
+.sidebar .menu-item > .menu-link:focus {
+  color: var(--theme-color); /* brand DOAR pe hover/active */
+}
+
+/* dacă ai setat accidental o regulă globală pe .menu-link cu brand, anulăm */
+.menu-bar__one .menu-link { color: #2b3640; }
+.menu-bar__one li.is-active > a.menu-link { color: var(--theme-color); }
+
+
+

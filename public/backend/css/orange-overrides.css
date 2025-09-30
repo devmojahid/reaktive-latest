@@ -1,0 +1,82 @@
+
+/* orange-overrides.css
+   Scope: light-touch color overrides to remove violet/indigo accents
+   Load this AFTER Bootstrap and your main theme CSS.
+*/
+
+:root {
+  --theme-color: #FF3C00; /* primary orange */
+}
+
+/* ----- Mobile header subtle borders (was rgba(83,86,251,0.16) / rgba(239,237,254,0.6)) ----- */
+@media only screen and (max-width: 1278px) {
+  .crancy-header {
+    border-bottom: 1px solid rgba(255, 120, 0, 0.16) !important;
+    background-color: rgba(255, 237, 230, 0.6) !important;
+  }
+}
+
+/* Slick dots / arrows accents (was blue/violet) */
+.slick-dots li button { background: #FFC8AE !important; }
+.slick-dots li.slick-active button { background: #FF3C00 !important; }
+.slick-arrow {
+  background: #FFE6D9 !important;
+  color: #FF7A33 !important;
+}
+.slick-arrow:hover {
+  background: linear-gradient(134.38deg, #FF3C00 0%, #FF8A3D 43.55%, #FF3C00 104.51%) !important;
+  color: #fff !important;
+}
+.slick-arrow i {
+  background: linear-gradient(134.38deg, #FF3C00 0%, #FF8A3D 43.55%, #FF3C00 104.51%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  text-fill-color: transparent !important;
+}
+
+/* Generic gradient utility (zmr-gr-primary) */
+.zmr-gr-primary {
+  background: linear-gradient(134.38deg, #FF3C00 0%, #FF8A3D 43.55%, #FF3C00 104.51%) !important;
+}
+
+/* Section head badge accents */
+.section-head .sec-head__badge {
+  color: #FF6A24 !important;
+  background: #FFE6D9 !important;
+}
+.section-white-style .sec-head__badge {
+  background: rgba(255, 230, 217, 0.17) !important;
+  color: #fff !important;
+}
+
+/* Scroll-to-top and links that used #7186f5 blues */
+.scrollToTop,
+.scrollToTop i { color: #FF7A33 !important; }
+
+/* Offcanvas + inputs that used blue borders */
+.offcanvas-form .form-control { border: 1px solid #FF8A3D !important; }
+.offcanvas-header .btn-close:hover { color: #FF7A33 !important; }
+
+/* Charts container tweaks (in case any violet backgrounds linger) */
+.charts-main__title,
+.crancy-chart__inside { color: #14212b; } /* neutral text */
+.crancy-chart__inside canvas { background: transparent; }
+
+/* Keep admin menu structure intact: DO NOT touch sizes/spacing; only reinforce brand color */
+.crancy-btn.crancy-btn__primary,
+.crancy-btn.crancy-primary { background: var(--theme-color) !important; }
+.crancy-btn.crancy-btn__v2 { color: var(--theme-color) !important; border-color: var(--theme-color) !important; }
+.crancy-btn.crancy-btn__v2:hover { background-color: var(--theme-color) !important; color: #fff !important; }
+
+/* Optional: badges that might have used bluish tints */
+.badge.bg-primary { background-color: #FF3C00 !important; }
+.badge.bg-info { background-color: #FFB792 !important; color: #5A2B00 !important; }
+.badge.bg-secondary { background-color: #6c757d !important; } /* leave neutral */
+.badge.bg-light { background-color: #FFF4EF !important; color: #5A2B00 !important; }
+
+/* Subtle neutral replacements for lavender tints seen earlier */
+.crancy-color3__opacity--bg,
+.crancy-color1__opacity--bg { background-color: #FFF1EA !important; } /* was #efeffd / #e8edff */
+.crancy-acolor { color: #FFE0D1 !important; } /* was #e3e4fe */
+
