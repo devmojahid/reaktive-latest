@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 use Illuminate\View\View;
 use Modules\TourBooking\App\Models\Availability;
@@ -30,6 +31,18 @@ final class FrontBookingController extends Controller
      */
     public function bookingCheckoutView(Request $request)
     {
+        // Store intended URL if coming from booking process
+        if ($request->has('intended_from') && $request->intended_from === 'booking') {
+            $intendedUrl = url()->current() . '?' . http_build_query($request->except(['intended_from']));
+            session(['url.intended' => $intendedUrl]);
+            
+            // Debug log
+            \Log::info('Storing intended URL for booking flow', [
+                'intended_url' => $intendedUrl,
+                'session_id' => session()->getId()
+            ]);
+        }
+
         // ---- Payment settings (nemodificat conceptual) -----------------------
         $payment_data = PaymentGateway::all();
         foreach ($payment_data as $data_item) {

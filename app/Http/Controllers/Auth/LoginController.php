@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Auth;
 use Exception;
 use App\Models\User;
 use App\Rules\Captcha;
-use Auth, Hash, Str, Mail;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
 use App\Helper\EmailHelper;
 use Illuminate\Http\Request;
 use App\Mail\UserForgetPassword;
@@ -37,6 +40,23 @@ class LoginController extends Controller
      * @var string
      */
     protected $redirectTo = '/user/dashboard';
+
+    /**
+     * Get the post-register / post-login redirect path.
+     *
+     * @return string
+     */
+    public function redirectTo()
+    {
+        // Check if there's an intended URL (for booking flow)
+        if (session()->has('url.intended')) {
+            $intended = session()->pull('url.intended');
+            return $intended;
+        }
+
+        // Default redirect behavior
+        return $this->redirectTo;
+    }
 
     /**
      * Create a new controller instance.
@@ -93,6 +113,18 @@ class LoginController extends Controller
 
                             $notify_message = trans('translate.Login successfully');
                             $notify_message = array('message' => $notify_message, 'alert-type' => 'success');
+                            
+                            // Check for intended URL first (for booking flow)
+                            if (session()->has('url.intended')) {
+                                $intended = session()->pull('url.intended');
+                                \Log::info('Redirecting to intended URL after login', [
+                                    'intended_url' => $intended,
+                                    'user_id' => $user->id
+                                ]);
+                                return redirect($intended)->with($notify_message);
+                            }
+                            
+                            // Default redirect based on user type
                             if($user->is_seller == 1){
                                 return redirect()->route('agency.dashboard')->with($notify_message);
                             }else{
@@ -127,6 +159,8 @@ class LoginController extends Controller
     public function student_logout(){
 
         Auth::guard('web')->logout();
+        session()->forget('url.intended');
+        session()->forget('url.intended.timestamp');
 
         $notify_message = trans('translate.Logout successfully');
         $notify_message = array('message' => $notify_message, 'alert-type' => 'success');
@@ -284,6 +318,12 @@ class LoginController extends Controller
         $notify_message= trans('translate.Login Successfully');
         $notify_message=array('message'=>$notify_message,'alert-type'=>'success');
 
+        // Check for intended URL first (for booking flow)
+        if (session()->has('url.intended')) {
+            $intended = session()->pull('url.intended');
+            return redirect($intended)->with($notify_message);
+        }
+
         return redirect()->route('user.dashboard')->with($notify_message);
 
     }
@@ -317,6 +357,12 @@ class LoginController extends Controller
 
         $notify_message= trans('translate.Login Successfully');
         $notify_message=array('message'=>$notify_message,'alert-type'=>'success');
+
+        // Check for intended URL first (for booking flow)
+        if (session()->has('url.intended')) {
+            $intended = session()->pull('url.intended');
+            return redirect($intended)->with($notify_message);
+        }
 
         return redirect()->route('user.dashboard')->with($notify_message);
 

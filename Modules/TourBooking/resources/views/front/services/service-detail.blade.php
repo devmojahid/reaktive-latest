@@ -547,10 +547,11 @@
                     {{-- ========================= BOOK NOW SIDEBAR ========================= --}}
                     <div class="col-xl-3 col-lg-4">
                         <div x-data="bookingForm()" class="tg-tour-about-sidebar top-sticky mb-50">
-                            <form action="{{ route('front.tourbooking.book.checkout.view') }}">
+                            <form action="{{ route('front.tourbooking.book.checkout.view') }}" method="GET">
                                 <h4 class="tg-tour-about-title title-2 mb-15">Book Now</h4>
 
                                 <input type="hidden" name="service_id" value="{{ $service->id }}">
+                                <input type="hidden" name="intended_from" value="booking">
 
                                 <div class="tg-booking-form-parent-inner mb-10">
                                     <div class="tg-tour-about-date p-relative">
