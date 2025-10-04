@@ -190,7 +190,7 @@
                         <div class="crancy__currency-icon"><span>{{ config('settings.currency_icon', '$') }}</span></div>
                       </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 d-none">
                       <label class="crancy__item-label">{{ __('translate.Charge Type') }}</label>
                       <select name="charge_type" class="crancy__item-input">
                         <option value="flat">{{ __('translate.Flat Rate') }}</option>
@@ -297,7 +297,7 @@
                 <div class="crancy__currency-icon"><span>{{ config('settings.currency_icon', '$') }}</span></div>
               </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 d-none">
               <label class="crancy__item-label">{{ __('translate.Charge Type') }}</label>
               <select name="charge_type" id="edit_charge_type" class="crancy__item-input">
                 <option value="flat">{{ __('translate.Flat Rate') }}</option>
@@ -408,7 +408,7 @@
       const marker = L.marker([pickup.latitude, pickup.longitude], {icon: icon}).addTo(map);
 
       const extraCharge = pickup.extra_charge > 0 ? 
-        `<p class="charge">${pickup.formatted_extra_charge}</p>` :
+        `<p class="charge">Price: ${pickup.extra_charge}</p>` :
         `<p class="free">{{ __('translate.Free') }}</p>`;
 
       marker.bindPopup(`
