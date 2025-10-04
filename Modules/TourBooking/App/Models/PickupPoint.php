@@ -154,11 +154,13 @@ final class PickupPoint extends Model
             return 0.0;
         }
 
+        $baseCharge = (float) $this->extra_charge;
+
         return match($this->charge_type) {
-            'per_person' => $this->extra_charge * array_sum($quantities),
-            'per_adult'  => $this->extra_charge * ($quantities['adult'] ?? 0),
-            'per_child'  => $this->extra_charge * (($quantities['child'] ?? 0) + ($quantities['baby'] ?? 0) + ($quantities['infant'] ?? 0)),
-            default      => $this->extra_charge, // flat rate
+            'per_person' => $baseCharge * (float) array_sum($quantities),
+            'per_adult'  => $baseCharge * (float) ($quantities['adult'] ?? 0),
+            'per_child'  => $baseCharge * (float) (($quantities['child'] ?? 0) + ($quantities['baby'] ?? 0) + ($quantities['infant'] ?? 0)),
+            default      => $baseCharge, // flat rate
         };
     }
 }

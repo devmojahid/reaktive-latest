@@ -67,12 +67,12 @@
 
                                     @forelse($ticketLines as $line)
                                         @if(!($line['is_extra'] ?? false))
-                                            <div class="tg-tour-about-tickets mb-10">
-                                                <div class="tg-tour-about-tickets-adult">
-                                                    <span>{{ $line['label'] }}</span>
-                                                </div>
-                                                <div class="tg-tour-about-tickets-quantity">
-                                                    {{ $line['qty'] }}
+                                        <div class="tg-tour-about-tickets mb-10">
+                                            <div class="tg-tour-about-tickets-adult">
+                                                <span>{{ $line['label'] }}</span>
+                                            </div>
+                                            <div class="tg-tour-about-tickets-quantity">
+                                                {{ $line['qty'] }}
                                                     x {{ currency($line['unit']) }}
                                                     = {{ currency($line['subtotal']) }}
                                                 </div>

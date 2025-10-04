@@ -551,8 +551,10 @@
                                 <h4 class="tg-tour-about-title title-2 mb-15">Book Now</h4>
 
                                 <input type="hidden" name="service_id" value="{{ $service->id }}">
-                                <input type="hidden" name="intended_from" value="booking">
-                                <input type="hidden" name="pickup_point_id" x-bind:value="selectedPickupPoint?.id || ''">
+                                  <input type="hidden" name="intended_from" value="booking">
+                                  <input type="hidden" name="pickup_point_id" x-bind:value="selectedPickupPoint?.id || ''">
+                                  <input type="hidden" name="pickup_extra_charge" x-bind:value="pickupExtraCharge || 0">
+                                  <input type="hidden" name="availability_id" x-bind:value="currentAvailability?.id || ''">
 
                                 <div class="tg-booking-form-parent-inner mb-10">
                                     <div class="tg-tour-about-date p-relative">
@@ -726,9 +728,9 @@
                                         {{-- Location Detection --}}
                                         <div class="pickup-location-actions mt-2">
                                             <button type="button" @click="getCurrentLocation()" class="btn btn-sm btn-outline-primary">
-                                                <i class="fa fa-location-arrow"></i> {{ __('translate.Find Nearest') }}
+                                                <i class="fa fa-location-arrow"></i> {{ __('Find Nearest') }}
                                             </button>
-                                            <span x-show="locationLoading" class="text-muted ms-2">{{ __('translate.Getting location...') }}</span>
+                                            <span x-show="locationLoading" class="text-muted ms-2">{{ __('Getting location...') }}</span>
                                         </div>
                                     </div>
                                     <div class="tg-tour-about-border-doted mb-15"></div>
@@ -959,11 +961,11 @@
                             });
                         } else {
                             // Legacy pricing display
-                            if (info.special_price) {
-                                html += `<p class="mb-1"><strong>Special price (adult):</strong> {{ default_currency()['currency_icon'] }}${(+info.special_price * {{ default_currency()['currency_rate'] }}).toFixed(2)}</p>`;
-                            }
-                            if (info.per_children_price) {
-                                html += `<p class="mb-1"><strong>Child price:</strong> {{ default_currency()['currency_icon'] }}${(+info.per_children_price * {{ default_currency()['currency_rate'] }}).toFixed(2)}</p>`;
+                        if (info.special_price) {
+                            html += `<p class="mb-1"><strong>Special price (adult):</strong> {{ default_currency()['currency_icon'] }}${(+info.special_price * {{ default_currency()['currency_rate'] }}).toFixed(2)}</p>`;
+                        }
+                        if (info.per_children_price) {
+                            html += `<p class="mb-1"><strong>Child price:</strong> {{ default_currency()['currency_icon'] }}${(+info.per_children_price * {{ default_currency()['currency_rate'] }}).toFixed(2)}</p>`;
                             }
                         }
 
@@ -1109,6 +1111,7 @@
 
                 // === Date selection state ===
                 selectedDate: "{{ now()->format('Y-m-d') }}",
+                currentAvailability: null,
                 loading: false,
 
                 // === Pickup Points ===
@@ -1133,6 +1136,19 @@
 
                     this.fetchAvailabilityPricing(this.selectedDate);
                     this.initPickupPoints();
+                    
+                    // Watch for ticket changes to recalculate pickup charges
+                    this.$watch('tickets', () => {
+                        if (this.selectedPickupPoint?.id) {
+                            this.calculatePickupCharge();
+                        }
+                    }, { deep: true });
+
+                    this.$watch('ticketsLegacy', () => {
+                        if (this.selectedPickupPoint?.id) {
+                            this.calculatePickupCharge();
+                        }
+                    }, { deep: true });
                 },
 
                 // ===== Pickup Points Methods =====
@@ -1178,7 +1194,7 @@
                     const defaultLat = {{ $service->latitude ?? '40.7128' }};
                     const defaultLng = {{ $service->longitude ?? '-74.0060' }};
 
-                    this.pickupMap = L.map('pickup-map-container').setView([defaultLat, defaultLng], 10);
+                    this.pickupMap = L.map('pickup-map-container').setView([defaultLat, defaultLng], 12);
                     
                     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                         attribution: '© OpenStreetMap contributors'
@@ -1194,34 +1210,66 @@
                     this.pickupMarkers.forEach(marker => this.pickupMap.removeLayer(marker));
                     this.pickupMarkers = [];
 
+                    const bounds = [];
+
                     // Add pickup point markers
                     this.pickupPoints.forEach(pickup => {
                         const isSelected = this.selectedPickupPoint?.id === pickup.id;
+                        const isDefault = pickup.is_default;
+                        
+                        // Enhanced icon styling
+                        let color = '#28a745'; // free - green
+                        if (pickup.has_charge) color = '#dc3545'; // paid - red
+                        if (isSelected) color = '#007bff'; // selected - blue
+                        if (isDefault && !isSelected) color = '#ffc107'; // default - yellow
+
                         const icon = L.divIcon({
                             className: 'custom-pickup-marker',
-                            html: `<i class="fa fa-map-marker" style="color: ${isSelected ? '#007bff' : (pickup.has_charge ? '#dc3545' : '#28a745')}; font-size: 24px;"></i>`,
-                            iconSize: [25, 25],
-                            iconAnchor: [12, 24]
+                            html: `
+                                <div class="marker-wrapper">
+                                    <i class="fa fa-map-marker" style="color: ${color}; font-size: 28px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);"></i>
+                                    ${isSelected ? '<div class="selected-pulse"></div>' : ''}
+                                    ${isDefault ? '<div class="default-badge">★</div>' : ''}
+                                </div>
+                            `,
+                            iconSize: [35, 35],
+                            iconAnchor: [17, 32]
                         });
 
                         const marker = L.marker([pickup.coordinates.lat, pickup.coordinates.lng], {icon: icon})
                             .addTo(this.pickupMap);
 
+                        // Enhanced popup with better information
+                        const distanceText = pickup.distance ? `<p class="mb-1"><i class="fa fa-road"></i> <strong>${pickup.distance} km away</strong></p>` : '';
+                        const defaultText = pickup.is_default ? '<span class="badge badge-warning">Default</span>' : '';
+                        
                         const popupContent = `
-                            <div class="pickup-popup">
-                                <h6 class="mb-2">${pickup.name}</h6>
-                                <p class="mb-1"><i class="fa fa-map-marker"></i> ${pickup.address}</p>
-                                <p class="mb-1"><strong>${pickup.formatted_charge}</strong></p>
-                                ${pickup.distance ? `<p class="mb-0 text-muted">${pickup.distance} km away</p>` : ''}
+                            <div class="pickup-popup-enhanced">
+                                <h6 class="mb-2" style="color: ${color};">
+                                    <i class="fa fa-map-marker"></i> ${pickup.name} ${defaultText}
+                                </h6>
+                                <p class="mb-1"><i class="fa fa-map-pin"></i> ${pickup.address}</p>
+                                <p class="mb-1"><i class="fa ${pickup.has_charge ? 'fa-money text-danger' : 'fa-check-circle text-success'}"></i> <strong>${pickup.formatted_charge}</strong></p>
+                                ${distanceText}
+                                ${pickup.description ? `<p class="mb-0"><i class="fa fa-info-circle"></i> ${pickup.description}</p>` : ''}
+                                <div class="text-center mt-2">
+                                    <button class="btn btn-sm ${isSelected ? 'btn-success' : 'btn-primary'}" onclick="selectPickupFromMap(${pickup.id})">
+                                        ${isSelected ? '✓ Selected' : 'Select Point'}
+                                    </button>
+                                </div>
                             </div>
                         `;
 
-                        marker.bindPopup(popupContent);
+                        marker.bindPopup(popupContent, {
+                            maxWidth: 280,
+                            className: 'enhanced-popup'
+                        });
                         
                         marker.on('click', () => {
                             this.selectPickupPoint(pickup);
                         });
 
+                        bounds.push([pickup.coordinates.lat, pickup.coordinates.lng]);
                         this.pickupMarkers.push(marker);
                     });
 
@@ -1229,17 +1277,44 @@
                     if (this.userLocation) {
                         const userIcon = L.divIcon({
                             className: 'user-location-marker',
-                            html: '<i class="fa fa-location-arrow" style="color: #007bff; font-size: 20px;"></i>',
-                            iconSize: [20, 20],
-                            iconAnchor: [10, 10]
+                            html: `
+                                <div class="user-marker">
+                                    <i class="fa fa-location-arrow" style="color: #007bff; font-size: 22px;"></i>
+                                    <div class="user-pulse"></div>
+                                </div>
+                            `,
+                            iconSize: [25, 25],
+                            iconAnchor: [12, 12]
                         });
 
                         const userMarker = L.marker([this.userLocation.lat, this.userLocation.lng], {icon: userIcon})
                             .addTo(this.pickupMap)
-                            .bindPopup('Your Location');
+                            .bindPopup('<div class="text-center"><h6><i class="fa fa-user"></i> Your Location</h6></div>');
 
+                        bounds.push([this.userLocation.lat, this.userLocation.lng]);
                         this.pickupMarkers.push(userMarker);
                     }
+
+                    // Auto-fit map bounds or focus on default pickup
+                    if (bounds.length > 1) {
+                        this.pickupMap.fitBounds(bounds, { padding: [20, 20] });
+                    } else if (bounds.length === 1) {
+                        this.pickupMap.setView(bounds[0], 14);
+                    } else {
+                        // Focus on default pickup point if available
+                        const defaultPickup = this.pickupPoints.find(p => p.is_default);
+                        if (defaultPickup) {
+                            this.pickupMap.setView([defaultPickup.coordinates.lat, defaultPickup.coordinates.lng], 14);
+                        }
+                    }
+
+                    // Store reference for popup button clicks
+                    window.selectPickupFromMap = (pickupId) => {
+                        const pickup = this.pickupPoints.find(p => p.id === pickupId);
+                        if (pickup) {
+                            this.selectPickupPoint(pickup);
+                        }
+                    };
                 },
 
                 selectPickupPoint(pickup) {
@@ -1291,7 +1366,7 @@
 
                 getCurrentLocation() {
                     if (!navigator.geolocation) {
-                        alert('{{ __('translate.Geolocation is not supported by this browser') }}');
+                        alert('{{ __('Geolocation is not supported by this browser') }}');
                         return;
                     }
 
@@ -1314,7 +1389,7 @@
                         (error) => {
                             this.locationLoading = false;
                             console.error('Error getting location:', error);
-                            alert('{{ __('translate.Unable to get your location') }}');
+                            alert('{{ __('Unable to get your location') }}');
                         }
                     );
                 },
@@ -1336,6 +1411,9 @@
                             if (response.success && response.data) {
                                 const data = response.data;
                                 
+                                // Store current availability for form submission
+                                that.currentAvailability = data;
+                                
                                 // Handle age categories pricing (priority)
                                 if (data.age_categories) {
                                     Object.keys(data.age_categories).forEach(function (key) {
@@ -1352,7 +1430,7 @@
                                 if (data.prices) {
                                     // Update age-based prices from the unified pricing system
                                     Object.keys(data.prices).forEach(function (key) {
-                                        if (that.prices.hasOwnProperty(key)) {
+                                    if (that.prices.hasOwnProperty(key)) {
                                             const price = parseFloat(data.prices[key]);
                                             if (!isNaN(price)) {
                                                 that.prices[key] = price;
@@ -1531,8 +1609,10 @@
 
         /* Map Styles */
         #pickup-map-container {
-            border: 1px solid #dee2e6;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 2px solid #dee2e6;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-radius: 8px !important;
+            height: 350px !important;
         }
 
         .leaflet-popup-content {
@@ -1551,10 +1631,110 @@
             font-size: 13px;
         }
 
+        /* Enhanced Marker Styles */
         .custom-pickup-marker,
         .user-location-marker {
             background: none;
             border: none;
+        }
+
+        .marker-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .selected-pulse {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 45px;
+            height: 45px;
+            border: 3px solid #007bff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: pulse 2s infinite;
+            opacity: 0.6;
+        }
+
+        .default-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ffc107;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .user-marker {
+            position: relative;
+            display: inline-block;
+        }
+
+        .user-pulse {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 35px;
+            height: 35px;
+            border: 2px solid #007bff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: pulse 1.5s infinite;
+            opacity: 0.4;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0.8;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 0.4;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        /* Enhanced Popup Styles */
+        .pickup-popup-enhanced {
+            min-width: 220px;
+        }
+
+        .pickup-popup-enhanced h6 {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+        }
+
+        .pickup-popup-enhanced .badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            margin-left: 5px;
+        }
+
+        .badge-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .enhanced-popup .leaflet-popup-content {
+            margin: 12px;
+        }
+
+        .enhanced-popup .leaflet-popup-content-wrapper {
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
         /* Mobile Responsive */

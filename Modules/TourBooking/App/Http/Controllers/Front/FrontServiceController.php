@@ -799,7 +799,9 @@ final class FrontServiceController extends Controller
                 'coordinates'  => $pickup->coordinates,
                 'extra_charge' => $pickup->extra_charge,
                 'charge_type'  => $pickup->charge_type,
-                'formatted_charge' => $pickup->formatted_extra_charge,
+                'formatted_charge' => $pickup->hasExtraCharge() ? 
+                    currency($pickup->extra_charge) . ($pickup->charge_type !== 'flat' ? ' / ' . ucfirst(str_replace('per_', '', $pickup->charge_type)) : '') : 
+                    'Free',
                 'is_default'   => $pickup->is_default,
                 'distance'     => $pickup->distance ?? null,
                 'has_charge'   => $pickup->hasExtraCharge(),
