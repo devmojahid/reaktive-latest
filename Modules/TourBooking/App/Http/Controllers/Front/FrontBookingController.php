@@ -19,6 +19,7 @@ use Modules\TourBooking\App\Models\Coupon;
 use Modules\TourBooking\App\Models\ExtraCharge;
 use Modules\TourBooking\App\Models\Review;
 use Modules\TourBooking\App\Models\Service;
+use Modules\TourBooking\App\Models\PickupPoint;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Session;
 use Modules\Currency\App\Models\Currency;
@@ -37,7 +38,7 @@ final class FrontBookingController extends Controller
             session(['url.intended' => $intendedUrl]);
             
             // Debug log
-            \Log::info('Storing intended URL for booking flow', [
+            Log::info('Storing intended URL for booking flow', [
                 'intended_url' => $intendedUrl,
                 'session_id' => session()->getId()
             ]);
@@ -119,6 +120,17 @@ final class FrontBookingController extends Controller
             ->where('status', true)
             ->get();
 
+        // === Pickup Point Charges =============================================
+        $pickupCharge = 0.0;
+        $pickupPointName = null;
+        if ($request->filled('pickup_point_id')) {
+            $pickupPoint = PickupPoint::find($request->pickup_point_id);
+            if ($pickupPoint && $pickupPoint->service_id === $service->id) {
+                $pickupCharge = $pickupPoint->calculateExtraCharge($qty);
+                $pickupPointName = $pickupPoint->name;
+            }
+        }
+
         // === PREȚURI unitare pe categorii (folosim Service model methods) ==
         $unit = $service->effectivePriceSetForDate($date);
         
@@ -171,6 +183,19 @@ final class FrontBookingController extends Controller
                 'is_extra' => true,
             ];
             $total += $price;
+        }
+
+        // Pickup Point Charge
+        if ($pickupCharge > 0 && $pickupPointName) {
+            $lines[] = [
+                'label'    => 'Pickup: ' . $pickupPointName,
+                'key'      => 'pickup_charge',
+                'qty'      => 1,
+                'unit'     => $pickupCharge,
+                'subtotal' => $pickupCharge,
+                'is_extra' => true,
+            ];
+            $total += $pickupCharge;
         }
 
         // Compat vechi (person/children)
@@ -231,6 +256,9 @@ final class FrontBookingController extends Controller
             'extra_charges'   => $extraCharges->sum('price'),
             'extra_services'  => $extraCharges->pluck('id')->all(),
             'availability_id' => $availability?->id,
+            'pickup_point_id' => $request->pickup_point_id,
+            'pickup_charge'   => $pickupCharge,
+            'pickup_point_name' => $pickupPointName,
         ]);
 
         return view('tourbooking::front.bookings.checkout-view', [

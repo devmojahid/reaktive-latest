@@ -698,8 +698,16 @@
                                         
                                         {{-- Pickup Point Selection --}}
                                         <div class="pickup-points-list">
+                                            <div x-show="pickupLoading" class="pickup-loading-overlay">
+                                                <div class="d-flex align-items-center justify-content-center py-3">
+                                                    <div class="spinner-border spinner-border-sm me-2" role="status">
+                                                        <span class="visually-hidden">Loading...</span>
+                                                    </div>
+                                                    <span>{{ __('Calculating charges...') }}</span>
+                                                </div>
+                                            </div>
                                             <template x-for="(pickup, index) in (pickupPoints || [])" :key="'pickup-' + (pickup?.id || index)">
-                                                <div class="pickup-point-item mb-2" :class="{'selected': selectedPickupPoint?.id === pickup?.id}">
+                                                <div class="pickup-point-item mb-2" :class="{'selected': selectedPickupPoint?.id === pickup?.id, 'loading': pickupLoading}">
                                                     <div class="d-flex align-items-center">
                                                         <input 
                                                             type="radio" 
@@ -708,6 +716,7 @@
                                                             :id="'pickup_' + (pickup?.id || index)"
                                                             :checked="selectedPickupPoint?.id === pickup?.id"
                                                             @change="selectPickupPoint(pickup)"
+                                                            :disabled="pickupLoading"
                                                             class="me-2"
                                                         >
                                                         <label :for="'pickup_' + (pickup?.id || index)" class="pickup-point-label">
@@ -1118,6 +1127,7 @@
                 pickupPoints: [],
                 selectedPickupPoint: null,
                 pickupExtraCharge: 0,
+                pickupLoading: false,
                 pickupMap: null,
                 pickupMarkers: [],
                 userLocation: null,
@@ -1408,6 +1418,9 @@
                     const quantities = this.getCurrentQuantities();
                     console.log('Calculating pickup charge for:', this.selectedPickupPoint.name, 'Quantities:', quantities);
 
+                    // Show loading state
+                    this.pickupLoading = true;
+
                     $.ajax({
                         url: "{{ route('front.tourbooking.pickup-points.calculate-charge') }}",
                         method: 'POST',
@@ -1429,6 +1442,10 @@
                         error: (xhr, status, error) => {
                             console.error('Error calculating pickup charge:', {xhr, status, error});
                             this.pickupExtraCharge = 0;
+                        },
+                        complete: () => {
+                            // Hide loading state
+                            this.pickupLoading = false;
                         }
                     });
                 },
@@ -1683,6 +1700,37 @@
 
         .pickup-charge {
             font-weight: 600;
+        }
+
+        /* Pickup Loading Overlay */
+        .pickup-loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            z-index: 10;
+        }
+
+        .pickup-points-list {
+            position: relative;
+        }
+
+        .pickup-point-item.loading {
+            opacity: 0.6;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .pickup-point-item.loading input[type="radio"] {
+            opacity: 0.5;
+        }
+
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
         }
 
         .pickup-distance {

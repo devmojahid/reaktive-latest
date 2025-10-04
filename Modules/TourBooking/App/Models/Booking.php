@@ -61,6 +61,12 @@ final class Booking extends Model
         'is_reviewed',
         'meta_data',
         'is_per_person',
+        'pickup_point_id',
+        'pickup_charge',
+        'pickup_point_name',
+        'age_quantities',
+        'age_config',
+        'age_breakdown',
     ];
 
     /**
@@ -87,6 +93,7 @@ final class Booking extends Model
         'total' => 'decimal:2',
         'paid_amount' => 'decimal:2',
         'due_amount' => 'decimal:2',
+        'pickup_charge' => 'decimal:2',
         'extra_services' => 'json',
         'custom_fields' => 'json',
         'meta_data' => 'json',
@@ -95,10 +102,9 @@ final class Booking extends Model
         'completed_at' => 'datetime',
         'is_reviewed' => 'boolean',
         'is_per_person' => 'boolean',
-        'extra_services' => 'array',
-    'age_quantities' => 'array',
-    'age_config'     => 'array',
-    'age_breakdown'  => 'array',
+        'age_quantities' => 'array',
+        'age_config'     => 'array',
+        'age_breakdown'  => 'array',
     ];
 
     /**
@@ -123,6 +129,14 @@ final class Booking extends Model
     public function review(): HasOne
     {
         return $this->hasOne(Review::class);
+    }
+
+    /**
+     * Get the pickup point for this booking.
+     */
+    public function pickupPoint(): BelongsTo
+    {
+        return $this->belongsTo(PickupPoint::class);
     }
 
     /**

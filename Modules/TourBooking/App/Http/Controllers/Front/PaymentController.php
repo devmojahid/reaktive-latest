@@ -593,6 +593,11 @@ class PaymentController extends Controller
         $order->age_config     = $payment_cart['age_config'] ?? null;
         $order->age_breakdown  = $age_breakdown;
 
+        // Store pickup point information
+        $order->pickup_point_id = $payment_cart['pickup_point_id'] ?? null;
+        $order->pickup_charge = $payment_cart['pickup_charge'] ?? 0;
+        $order->pickup_point_name = $payment_cart['pickup_point_name'] ?? null;
+
         $order->save();
 
         // istoric cupon
