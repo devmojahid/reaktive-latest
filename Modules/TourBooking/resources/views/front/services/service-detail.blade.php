@@ -691,32 +691,32 @@
                                 {{-- Pickup Points --}}
                                 @if ($service->activePickupPoints->count() > 0)
                                     <div class="tg-tour-about-pickup mb-10">
-                                        <span class="tg-tour-about-sidebar-title mb-10 d-inline-block">{{ __('translate.Pickup Point') }}:</span>
+                                        <span class="tg-tour-about-sidebar-title mb-10 d-inline-block">{{ __('Pickup Point') }}:</span>
                                         
                                         {{-- Map Container --}}
                                         <div id="pickup-map-container" style="height: 300px; margin-bottom: 15px; border-radius: 8px; overflow: hidden;"></div>
                                         
                                         {{-- Pickup Point Selection --}}
                                         <div class="pickup-points-list">
-                                            <template x-for="(pickup, index) in pickupPoints" :key="pickup.id">
-                                                <div class="pickup-point-item mb-2" :class="{'selected': selectedPickupPoint?.id === pickup.id}">
+                                            <template x-for="(pickup, index) in (pickupPoints || [])" :key="'pickup-' + (pickup?.id || index)">
+                                                <div class="pickup-point-item mb-2" :class="{'selected': selectedPickupPoint?.id === pickup?.id}">
                                                     <div class="d-flex align-items-center">
                                                         <input 
                                                             type="radio" 
                                                             name="pickup_point_id" 
-                                                            :value="pickup.id"
-                                                            :id="'pickup_' + pickup.id"
-                                                            x-model="selectedPickupPoint.id"
+                                                            :value="pickup?.id || ''"
+                                                            :id="'pickup_' + (pickup?.id || index)"
+                                                            :checked="selectedPickupPoint?.id === pickup?.id"
                                                             @change="selectPickupPoint(pickup)"
                                                             class="me-2"
                                                         >
-                                                        <label :for="'pickup_' + pickup.id" class="pickup-point-label">
+                                                        <label :for="'pickup_' + (pickup?.id || index)" class="pickup-point-label">
                                                             <div class="pickup-info">
-                                                                <h6 class="pickup-name mb-1" x-text="pickup.name"></h6>
-                                                                <p class="pickup-address mb-0" x-text="pickup.address"></p>
+                                                                <h6 class="pickup-name mb-1" x-text="pickup?.name || ''"></h6>
+                                                                <p class="pickup-address mb-0" x-text="pickup?.address || ''"></p>
                                                                 <div class="pickup-details d-flex justify-content-between">
-                                                                    <span class="pickup-charge" :class="pickup.has_charge ? 'text-danger' : 'text-success'" x-text="pickup.formatted_charge"></span>
-                                                                    <span x-show="pickup.distance" class="pickup-distance text-muted" x-text="pickup.distance + ' km'"></span>
+                                                                    <span class="pickup-charge" :class="pickup?.has_charge ? 'text-danger' : 'text-success'" x-text="pickup?.formatted_charge || 'Free'"></span>
+                                                                    <span x-show="pickup?.distance" class="pickup-distance text-muted" x-text="(pickup?.distance || 0) + ' km'"></span>
                                                                 </div>
                                                             </div>
                                                         </label>
@@ -1116,7 +1116,7 @@
 
                 // === Pickup Points ===
                 pickupPoints: [],
-                selectedPickupPoint: { id: null },
+                selectedPickupPoint: null,
                 pickupExtraCharge: 0,
                 pickupMap: null,
                 pickupMarkers: [],
@@ -1153,35 +1153,71 @@
 
                 // ===== Pickup Points Methods =====
                 initPickupPoints() {
-                    this.fetchPickupPoints();
-                    this.$nextTick(() => {
-                        this.initMap();
-                    });
+                    // Ensure pickup points array is initialized
+                    if (!Array.isArray(this.pickupPoints)) {
+                        this.pickupPoints = [];
+                    }
+                    
+                    // Only fetch if service has pickup points
+                    @if ($service->activePickupPoints->count() > 0)
+                        this.fetchPickupPoints();
+                        this.$nextTick(() => {
+                            this.initMap();
+                        });
+                    @endif
                 },
 
                 fetchPickupPoints() {
+                    // Ensure array is initialized
+                    if (!Array.isArray(this.pickupPoints)) {
+                        this.pickupPoints = [];
+                    }
+
                     $.ajax({
                         url: "{{ route('front.tourbooking.pickup-points.get') }}",
                         method: 'GET',
                         data: {
                             service_id: {{ $service->id }},
                             user_lat: this.userLocation?.lat,
-                            user_lng: this.userLocation?.lng
+                            user_lng: this.userLocation?.lng,
+                            _token: "{{ csrf_token() }}"
                         },
                         success: (response) => {
-                            if (response.success) {
-                                this.pickupPoints = response.data;
+                            console.log('Pickup points response:', response);
+                            
+                            if (response.success && Array.isArray(response.data)) {
+                                // Ensure each pickup point has required properties
+                                this.pickupPoints = response.data.map(pickup => ({
+                                    id: pickup.id || null,
+                                    name: pickup.name || 'Unknown',
+                                    description: pickup.description || '',
+                                    address: pickup.address || '',
+                                    coordinates: pickup.coordinates || { lat: 0, lng: 0 },
+                                    extra_charge: pickup.extra_charge || 0,
+                                    charge_type: pickup.charge_type || 'flat',
+                                    formatted_charge: pickup.formatted_charge || 'Free',
+                                    is_default: pickup.is_default || false,
+                                    distance: pickup.distance || null,
+                                    has_charge: pickup.has_charge || false
+                                }));
+
                                 this.updateMapMarkers();
                                 
-                                // Auto-select default pickup point
-                                const defaultPickup = this.pickupPoints.find(p => p.is_default);
-                                if (defaultPickup && !this.selectedPickupPoint.id) {
-                                    this.selectPickupPoint(defaultPickup);
+                                // Auto-select default pickup point if none selected
+                                if (!this.selectedPickupPoint) {
+                                    const defaultPickup = this.pickupPoints.find(p => p.is_default);
+                                    if (defaultPickup) {
+                                        this.selectPickupPoint(defaultPickup);
+                                    }
                                 }
+                            } else {
+                                console.error('Invalid pickup points response:', response);
+                                this.pickupPoints = [];
                             }
                         },
-                        error: (err) => {
-                            console.error('Error fetching pickup points:', err);
+                        error: (xhr, status, error) => {
+                            console.error('Error fetching pickup points:', {xhr, status, error});
+                            this.pickupPoints = [];
                         }
                     });
                 },
@@ -1204,16 +1240,28 @@
                 },
 
                 updateMapMarkers() {
-                    if (!this.pickupMap) return;
+                    if (!this.pickupMap || !Array.isArray(this.pickupPoints)) return;
 
                     // Clear existing markers
-                    this.pickupMarkers.forEach(marker => this.pickupMap.removeLayer(marker));
+                    this.pickupMarkers.forEach(marker => {
+                        try {
+                            this.pickupMap.removeLayer(marker);
+                        } catch (e) {
+                            console.warn('Error removing marker:', e);
+                        }
+                    });
                     this.pickupMarkers = [];
 
                     const bounds = [];
 
                     // Add pickup point markers
-                    this.pickupPoints.forEach(pickup => {
+                    this.pickupPoints.forEach((pickup, index) => {
+                        // Validate pickup data
+                        if (!pickup || !pickup.coordinates || !pickup.coordinates.lat || !pickup.coordinates.lng) {
+                            console.warn('Invalid pickup point data:', pickup);
+                            return;
+                        }
+
                         const isSelected = this.selectedPickupPoint?.id === pickup.id;
                         const isDefault = pickup.is_default;
                         
@@ -1236,76 +1284,88 @@
                             iconAnchor: [17, 32]
                         });
 
-                        const marker = L.marker([pickup.coordinates.lat, pickup.coordinates.lng], {icon: icon})
-                            .addTo(this.pickupMap);
+                        try {
+                            const marker = L.marker([pickup.coordinates.lat, pickup.coordinates.lng], {icon: icon})
+                                .addTo(this.pickupMap);
 
-                        // Enhanced popup with better information
-                        const distanceText = pickup.distance ? `<p class="mb-1"><i class="fa fa-road"></i> <strong>${pickup.distance} km away</strong></p>` : '';
-                        const defaultText = pickup.is_default ? '<span class="badge badge-warning">Default</span>' : '';
-                        
-                        const popupContent = `
-                            <div class="pickup-popup-enhanced">
-                                <h6 class="mb-2" style="color: ${color};">
-                                    <i class="fa fa-map-marker"></i> ${pickup.name} ${defaultText}
-                                </h6>
-                                <p class="mb-1"><i class="fa fa-map-pin"></i> ${pickup.address}</p>
-                                <p class="mb-1"><i class="fa ${pickup.has_charge ? 'fa-money text-danger' : 'fa-check-circle text-success'}"></i> <strong>${pickup.formatted_charge}</strong></p>
-                                ${distanceText}
-                                ${pickup.description ? `<p class="mb-0"><i class="fa fa-info-circle"></i> ${pickup.description}</p>` : ''}
-                                <div class="text-center mt-2">
-                                    <button class="btn btn-sm ${isSelected ? 'btn-success' : 'btn-primary'}" onclick="selectPickupFromMap(${pickup.id})">
-                                        ${isSelected ? '✓ Selected' : 'Select Point'}
-                                    </button>
+                            // Enhanced popup with better information
+                            const distanceText = pickup.distance ? `<p class="mb-1"><i class="fa fa-road"></i> <strong>${pickup.distance} km away</strong></p>` : '';
+                            const defaultText = pickup.is_default ? '<span class="badge badge-warning">Default</span>' : '';
+                            
+                            const popupContent = `
+                                <div class="pickup-popup-enhanced">
+                                    <h6 class="mb-2" style="color: ${color};">
+                                        <i class="fa fa-map-marker"></i> ${pickup.name || 'Unknown'} ${defaultText}
+                                    </h6>
+                                    <p class="mb-1"><i class="fa fa-map-pin"></i> ${pickup.address || 'No address'}</p>
+                                    <p class="mb-1"><i class="fa ${pickup.has_charge ? 'fa-money text-danger' : 'fa-check-circle text-success'}"></i> <strong>${pickup.formatted_charge || 'Free'}</strong></p>
+                                    ${distanceText}
+                                    ${pickup.description ? `<p class="mb-0"><i class="fa fa-info-circle"></i> ${pickup.description}</p>` : ''}
+                                    <div class="text-center mt-2">
+                                        <button class="btn btn-sm ${isSelected ? 'btn-success' : 'btn-primary'}" onclick="selectPickupFromMap(${pickup.id})">
+                                            ${isSelected ? '✓ Selected' : 'Select Point'}
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        `;
+                            `;
 
-                        marker.bindPopup(popupContent, {
-                            maxWidth: 280,
-                            className: 'enhanced-popup'
-                        });
-                        
-                        marker.on('click', () => {
-                            this.selectPickupPoint(pickup);
-                        });
+                            marker.bindPopup(popupContent, {
+                                maxWidth: 280,
+                                className: 'enhanced-popup'
+                            });
+                            
+                            marker.on('click', () => {
+                                this.selectPickupPoint(pickup);
+                            });
 
-                        bounds.push([pickup.coordinates.lat, pickup.coordinates.lng]);
-                        this.pickupMarkers.push(marker);
+                            bounds.push([pickup.coordinates.lat, pickup.coordinates.lng]);
+                            this.pickupMarkers.push(marker);
+                        } catch (e) {
+                            console.error('Error creating marker for pickup:', pickup.name, e);
+                        }
                     });
 
                     // Add user location marker if available
-                    if (this.userLocation) {
-                        const userIcon = L.divIcon({
-                            className: 'user-location-marker',
-                            html: `
-                                <div class="user-marker">
-                                    <i class="fa fa-location-arrow" style="color: #007bff; font-size: 22px;"></i>
-                                    <div class="user-pulse"></div>
-                                </div>
-                            `,
-                            iconSize: [25, 25],
-                            iconAnchor: [12, 12]
-                        });
+                    if (this.userLocation?.lat && this.userLocation?.lng) {
+                        try {
+                            const userIcon = L.divIcon({
+                                className: 'user-location-marker',
+                                html: `
+                                    <div class="user-marker">
+                                        <i class="fa fa-location-arrow" style="color: #007bff; font-size: 22px;"></i>
+                                        <div class="user-pulse"></div>
+                                    </div>
+                                `,
+                                iconSize: [25, 25],
+                                iconAnchor: [12, 12]
+                            });
 
-                        const userMarker = L.marker([this.userLocation.lat, this.userLocation.lng], {icon: userIcon})
-                            .addTo(this.pickupMap)
-                            .bindPopup('<div class="text-center"><h6><i class="fa fa-user"></i> Your Location</h6></div>');
+                            const userMarker = L.marker([this.userLocation.lat, this.userLocation.lng], {icon: userIcon})
+                                .addTo(this.pickupMap)
+                                .bindPopup('<div class="text-center"><h6><i class="fa fa-user"></i> Your Location</h6></div>');
 
-                        bounds.push([this.userLocation.lat, this.userLocation.lng]);
-                        this.pickupMarkers.push(userMarker);
+                            bounds.push([this.userLocation.lat, this.userLocation.lng]);
+                            this.pickupMarkers.push(userMarker);
+                        } catch (e) {
+                            console.error('Error creating user location marker:', e);
+                        }
                     }
 
                     // Auto-fit map bounds or focus on default pickup
-                    if (bounds.length > 1) {
-                        this.pickupMap.fitBounds(bounds, { padding: [20, 20] });
-                    } else if (bounds.length === 1) {
-                        this.pickupMap.setView(bounds[0], 14);
-                    } else {
-                        // Focus on default pickup point if available
-                        const defaultPickup = this.pickupPoints.find(p => p.is_default);
-                        if (defaultPickup) {
-                            this.pickupMap.setView([defaultPickup.coordinates.lat, defaultPickup.coordinates.lng], 14);
+                    try {
+                        if (bounds.length > 1) {
+                            this.pickupMap.fitBounds(bounds, { padding: [20, 20] });
+                        } else if (bounds.length === 1) {
+                            this.pickupMap.setView(bounds[0], 14);
+                        } else {
+                            // Focus on default pickup point if available
+                            const defaultPickup = this.pickupPoints.find(p => p.is_default);
+                            if (defaultPickup && defaultPickup.coordinates) {
+                                this.pickupMap.setView([defaultPickup.coordinates.lat, defaultPickup.coordinates.lng], 14);
+                            }
                         }
+                    } catch (e) {
+                        console.error('Error setting map bounds:', e);
                     }
 
                     // Store reference for popup button clicks
@@ -1318,9 +1378,25 @@
                 },
 
                 selectPickupPoint(pickup) {
-                    this.selectedPickupPoint = pickup;
+                    if (!pickup || !pickup.id) {
+                        console.warn('Invalid pickup point:', pickup);
+                        return;
+                    }
+
+                    // Clear previous selection
+                    this.selectedPickupPoint = null;
+                    this.pickupExtraCharge = 0;
+
+                    // Set new selection  
+                    this.selectedPickupPoint = { ...pickup };
+                    
+                    // Calculate new charge
                     this.calculatePickupCharge();
-                    this.updateMapMarkers(); // Update marker colors
+                    
+                    // Update map markers to reflect selection
+                    this.updateMapMarkers();
+                    
+                    console.log('Pickup point selected:', pickup.name, 'Charge:', this.pickupExtraCharge);
                 },
 
                 calculatePickupCharge() {
@@ -1330,6 +1406,7 @@
                     }
 
                     const quantities = this.getCurrentQuantities();
+                    console.log('Calculating pickup charge for:', this.selectedPickupPoint.name, 'Quantities:', quantities);
 
                     $.ajax({
                         url: "{{ route('front.tourbooking.pickup-points.calculate-charge') }}",
@@ -1340,12 +1417,17 @@
                             _token: $('meta[name="csrf-token"]').attr('content')
                         },
                         success: (response) => {
-                            if (response.success) {
+                            console.log('Pickup charge response:', response);
+                            if (response.success && typeof response.extra_charge === 'number') {
                                 this.pickupExtraCharge = response.extra_charge;
+                                console.log('Updated pickup charge:', this.pickupExtraCharge);
+                            } else {
+                                console.error('Invalid pickup charge response:', response);
+                                this.pickupExtraCharge = 0;
                             }
                         },
-                        error: (err) => {
-                            console.error('Error calculating pickup charge:', err);
+                        error: (xhr, status, error) => {
+                            console.error('Error calculating pickup charge:', {xhr, status, error});
                             this.pickupExtraCharge = 0;
                         }
                     });
