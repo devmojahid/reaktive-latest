@@ -172,6 +172,16 @@ final class Service extends Model
         return $this->hasMany(Availability::class);
     }
 
+    public function pickupPoints(): HasMany
+    {
+        return $this->hasMany(PickupPoint::class);
+    }
+
+    public function activePickupPoints(): HasMany
+    {
+        return $this->hasMany(PickupPoint::class)->where('status', true);
+    }
+
     public function availabilitieByDate(): HasOne
     {
         return $this->hasOne(Availability::class)

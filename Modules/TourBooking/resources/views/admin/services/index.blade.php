@@ -135,6 +135,7 @@
                                                                 @endif
                                                                 <li><a class="dropdown-item" href="{{ route('admin.tourbooking.services.availability', $service->id) }}">{{ __('translate.Availability') }}</a></li>
                                                                 <li><a class="dropdown-item" href="{{ route('admin.tourbooking.services.media', $service->id) }}">{{ __('translate.Media Gallery') }}</a></li>
+                                                                <li><a class="dropdown-item" href="{{ route('admin.tourbooking.services.pickup-points', $service->id) }}">{{ __('translate.Pickup Points') }}</a></li>
                                                             </ul>
                                                         </div>
                                                     </td>

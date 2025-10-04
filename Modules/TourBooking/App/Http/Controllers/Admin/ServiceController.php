@@ -18,6 +18,7 @@ use Modules\TourBooking\App\Models\Amenity;
 use Modules\TourBooking\App\Models\Availability;
 use Modules\TourBooking\App\Models\Destination;
 use Modules\TourBooking\App\Models\ExtraCharge;
+use Modules\TourBooking\App\Models\PickupPoint;
 use Modules\TourBooking\App\Models\Review;
 use Modules\TourBooking\App\Models\Service;
 use Modules\TourBooking\App\Models\ServiceMedia;
@@ -648,6 +649,100 @@ final class ServiceController extends Controller
     {
         $availability->delete();
         return back()->with(['message' => trans('translate.Availability deleted successfully'), 'alert-type' => 'success']);
+    }
+
+    /** Pickup Points: list */
+    public function showPickupPoints(Service $service): View
+    {
+        $service->load('pickupPoints');
+        return view('tourbooking::admin.services.pickup_points', compact('service'));
+    }
+
+    /** Pickup Points: store */
+    public function storePickupPoint(Request $request, Service $service): RedirectResponse
+    {
+        $request->validate([
+            'name'        => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'address'     => 'required|string|max:500',
+            'latitude'    => 'required|numeric|between:-90,90',
+            'longitude'   => 'required|numeric|between:-180,180',
+            'extra_charge'=> 'nullable|numeric|min:0',
+            'charge_type' => 'required|in:flat,per_person,per_adult,per_child',
+            'is_default'  => 'boolean',
+            'status'      => 'boolean',
+            'notes'       => 'nullable|string',
+        ]);
+
+        // Ensure only one default pickup point per service
+        if ($request->has('is_default') && $request->is_default) {
+            PickupPoint::where('service_id', $service->id)
+                ->where('is_default', true)
+                ->update(['is_default' => false]);
+        }
+
+        PickupPoint::create([
+            'service_id'   => $service->id,
+            'name'         => $request->name,
+            'description'  => $request->description,
+            'address'      => $request->address,
+            'latitude'     => $request->latitude,
+            'longitude'    => $request->longitude,
+            'extra_charge' => $request->extra_charge,
+            'charge_type'  => $request->charge_type,
+            'is_default'   => $request->has('is_default'),
+            'status'       => $request->has('status'),
+            'notes'        => $request->notes,
+        ]);
+
+        return back()->with(['message' => trans('translate.Pickup point added successfully'), 'alert-type' => 'success']);
+    }
+
+    /** Pickup Points: update */
+    public function updatePickupPoint(Request $request, PickupPoint $pickupPoint): RedirectResponse
+    {
+        $request->validate([
+            'name'        => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'address'     => 'required|string|max:500',
+            'latitude'    => 'required|numeric|between:-90,90',
+            'longitude'   => 'required|numeric|between:-180,180',
+            'extra_charge'=> 'nullable|numeric|min:0',
+            'charge_type' => 'required|in:flat,per_person,per_adult,per_child',
+            'is_default'  => 'boolean',
+            'status'      => 'boolean',
+            'notes'       => 'nullable|string',
+        ]);
+
+        // Ensure only one default pickup point per service
+        if ($request->has('is_default') && $request->is_default) {
+            PickupPoint::where('service_id', $pickupPoint->service_id)
+                ->where('id', '!=', $pickupPoint->id)
+                ->where('is_default', true)
+                ->update(['is_default' => false]);
+        }
+
+        $pickupPoint->update([
+            'name'         => $request->name,
+            'description'  => $request->description,
+            'address'      => $request->address,
+            'latitude'     => $request->latitude,
+            'longitude'    => $request->longitude,
+            'extra_charge' => $request->extra_charge,
+            'charge_type'  => $request->charge_type,
+            'is_default'   => $request->has('is_default'),
+            'status'       => $request->has('status'),
+            'notes'        => $request->notes,
+        ]);
+
+        return back()->with(['message' => trans('translate.Pickup point updated successfully'), 'alert-type' => 'success']);
+    }
+
+    /** Pickup Points: delete */
+    public function deletePickupPoint(PickupPoint $pickupPoint): RedirectResponse
+    {
+        $pickupPoint->delete();
+        return back()->with(['message' => trans('translate.Pickup point deleted successfully'), 'alert-type' => 'success']);
     }
 
     /** Filter by type helpers */

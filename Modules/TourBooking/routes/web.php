@@ -86,6 +86,12 @@ Route::group(['as' => 'admin.tourbooking.', 'prefix' => 'admin/tourbooking', 'mi
     Route::put('services/availability/{availability}', [ServiceController::class, 'updateAvailability'])->name('services.availability.update');
     Route::delete('services/availability/{availability}', [ServiceController::class, 'deleteAvailability'])->name('services.availability.destroy');
 
+    // Pickup Points
+    Route::get('services/{service}/pickup-points', [ServiceController::class, 'showPickupPoints'])->name('services.pickup-points');
+    Route::post('services/{service}/pickup-points', [ServiceController::class, 'storePickupPoint'])->name('services.pickup-points.store');
+    Route::put('services/pickup-points/{pickupPoint}', [ServiceController::class, 'updatePickupPoint'])->name('services.pickup-points.update');
+    Route::delete('services/pickup-points/{pickupPoint}', [ServiceController::class, 'deletePickupPoint'])->name('services.pickup-points.destroy');
+
     // Booking Management
     Route::get('bookings', [BookingController::class, 'index'])->name('bookings.index');
     Route::get('bookings/create', [BookingController::class, 'create'])->name('bookings.create');
@@ -235,6 +241,12 @@ Route::group(['as' => 'front.tourbooking.', 'prefix' => 'tour-booking', 'middlew
 
     Route::get('/get-availability-by-date', [FrontServiceController::class, 'getAvailityByDate'])
         ->name('get.availity.by.date');
+
+    // Pickup Points API
+    Route::get('/pickup-points', [FrontServiceController::class, 'getPickupPoints'])
+        ->name('pickup-points.get');
+    Route::post('/pickup-points/calculate-charge', [FrontServiceController::class, 'calculatePickupCharge'])
+        ->name('pickup-points.calculate-charge');
 
     // Categories
     Route::get('/tours', [FrontServiceController::class, 'tours'])->name('tours');

@@ -552,6 +552,7 @@
 
                                 <input type="hidden" name="service_id" value="{{ $service->id }}">
                                 <input type="hidden" name="intended_from" value="booking">
+                                <input type="hidden" name="pickup_point_id" x-bind:value="selectedPickupPoint?.id || ''">
 
                                 <div class="tg-booking-form-parent-inner mb-10">
                                     <div class="tg-tour-about-date p-relative">
@@ -685,16 +686,64 @@
                                     <div class="tg-tour-about-border-doted mb-15"></div>
                                 @endif
 
+                                {{-- Pickup Points --}}
+                                @if ($service->activePickupPoints->count() > 0)
+                                    <div class="tg-tour-about-pickup mb-10">
+                                        <span class="tg-tour-about-sidebar-title mb-10 d-inline-block">{{ __('translate.Pickup Point') }}:</span>
+                                        
+                                        {{-- Map Container --}}
+                                        <div id="pickup-map-container" style="height: 300px; margin-bottom: 15px; border-radius: 8px; overflow: hidden;"></div>
+                                        
+                                        {{-- Pickup Point Selection --}}
+                                        <div class="pickup-points-list">
+                                            <template x-for="(pickup, index) in pickupPoints" :key="pickup.id">
+                                                <div class="pickup-point-item mb-2" :class="{'selected': selectedPickupPoint?.id === pickup.id}">
+                                                    <div class="d-flex align-items-center">
+                                                        <input 
+                                                            type="radio" 
+                                                            name="pickup_point_id" 
+                                                            :value="pickup.id"
+                                                            :id="'pickup_' + pickup.id"
+                                                            x-model="selectedPickupPoint.id"
+                                                            @change="selectPickupPoint(pickup)"
+                                                            class="me-2"
+                                                        >
+                                                        <label :for="'pickup_' + pickup.id" class="pickup-point-label">
+                                                            <div class="pickup-info">
+                                                                <h6 class="pickup-name mb-1" x-text="pickup.name"></h6>
+                                                                <p class="pickup-address mb-0" x-text="pickup.address"></p>
+                                                                <div class="pickup-details d-flex justify-content-between">
+                                                                    <span class="pickup-charge" :class="pickup.has_charge ? 'text-danger' : 'text-success'" x-text="pickup.formatted_charge"></span>
+                                                                    <span x-show="pickup.distance" class="pickup-distance text-muted" x-text="pickup.distance + ' km'"></span>
+                                                                </div>
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </div>
+
+                                        {{-- Location Detection --}}
+                                        <div class="pickup-location-actions mt-2">
+                                            <button type="button" @click="getCurrentLocation()" class="btn btn-sm btn-outline-primary">
+                                                <i class="fa fa-location-arrow"></i> {{ __('translate.Find Nearest') }}
+                                            </button>
+                                            <span x-show="locationLoading" class="text-muted ms-2">{{ __('translate.Getting location...') }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="tg-tour-about-border-doted mb-15"></div>
+                                @endif
+
                                 {{-- Total --}}
                                 @if ($hasAgePricing)
                                     <div class="tg-tour-about-coast d-flex align-items-center flex-wrap justify-content-between mb-20">
                                         <span class="tg-tour-about-sidebar-title d-inline-block">Total Cost:</span>
-                                        <h5 class="total-price" x-text="calculatePrice(totalCostAge)"></h5>
+                                        <h5 class="total-price" x-text="calculatePrice(totalCostWithPickup)"></h5>
                                     </div>
                                 @elseif ($service->is_per_person)
                                     <div class="tg-tour-about-coast d-flex align-items-center flex-wrap justify-content-between mb-20">
                                         <span class="tg-tour-about-sidebar-title d-inline-block">Total Cost:</span>
-                                        <h5 class="total-price" x-text="calculatePrice(totalCostLegacy)"></h5>
+                                        <h5 class="total-price" x-text="calculatePrice(totalCostLegacyWithPickup)"></h5>
                                     </div>
                                 @else
                                     <div class="mt-4 tg-tour-about-coast d-flex align-items-center flex-wrap justify-content-between mb-20">
@@ -723,6 +772,7 @@
 
 @push('js_section')
     <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.7/dist/loadingoverlay.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 
 <script>
@@ -1061,6 +1111,15 @@
                 selectedDate: "{{ now()->format('Y-m-d') }}",
                 loading: false,
 
+                // === Pickup Points ===
+                pickupPoints: [],
+                selectedPickupPoint: { id: null },
+                pickupExtraCharge: 0,
+                pickupMap: null,
+                pickupMarkers: [],
+                userLocation: null,
+                locationLoading: false,
+
                 init() {
                     const input = document.querySelector("input[name='check_in_date']");
                     if (input && input.value) this.selectedDate = input.value;
@@ -1073,6 +1132,191 @@
                     });
 
                     this.fetchAvailabilityPricing(this.selectedDate);
+                    this.initPickupPoints();
+                },
+
+                // ===== Pickup Points Methods =====
+                initPickupPoints() {
+                    this.fetchPickupPoints();
+                    this.$nextTick(() => {
+                        this.initMap();
+                    });
+                },
+
+                fetchPickupPoints() {
+                    $.ajax({
+                        url: "{{ route('front.tourbooking.pickup-points.get') }}",
+                        method: 'GET',
+                        data: {
+                            service_id: {{ $service->id }},
+                            user_lat: this.userLocation?.lat,
+                            user_lng: this.userLocation?.lng
+                        },
+                        success: (response) => {
+                            if (response.success) {
+                                this.pickupPoints = response.data;
+                                this.updateMapMarkers();
+                                
+                                // Auto-select default pickup point
+                                const defaultPickup = this.pickupPoints.find(p => p.is_default);
+                                if (defaultPickup && !this.selectedPickupPoint.id) {
+                                    this.selectPickupPoint(defaultPickup);
+                                }
+                            }
+                        },
+                        error: (err) => {
+                            console.error('Error fetching pickup points:', err);
+                        }
+                    });
+                },
+
+                initMap() {
+                    const mapContainer = document.getElementById('pickup-map-container');
+                    if (!mapContainer || this.pickupMap) return;
+
+                    // Default to service location or a general location
+                    const defaultLat = {{ $service->latitude ?? '40.7128' }};
+                    const defaultLng = {{ $service->longitude ?? '-74.0060' }};
+
+                    this.pickupMap = L.map('pickup-map-container').setView([defaultLat, defaultLng], 10);
+                    
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '© OpenStreetMap contributors'
+                    }).addTo(this.pickupMap);
+
+                    this.updateMapMarkers();
+                },
+
+                updateMapMarkers() {
+                    if (!this.pickupMap) return;
+
+                    // Clear existing markers
+                    this.pickupMarkers.forEach(marker => this.pickupMap.removeLayer(marker));
+                    this.pickupMarkers = [];
+
+                    // Add pickup point markers
+                    this.pickupPoints.forEach(pickup => {
+                        const isSelected = this.selectedPickupPoint?.id === pickup.id;
+                        const icon = L.divIcon({
+                            className: 'custom-pickup-marker',
+                            html: `<i class="fa fa-map-marker" style="color: ${isSelected ? '#007bff' : (pickup.has_charge ? '#dc3545' : '#28a745')}; font-size: 24px;"></i>`,
+                            iconSize: [25, 25],
+                            iconAnchor: [12, 24]
+                        });
+
+                        const marker = L.marker([pickup.coordinates.lat, pickup.coordinates.lng], {icon: icon})
+                            .addTo(this.pickupMap);
+
+                        const popupContent = `
+                            <div class="pickup-popup">
+                                <h6 class="mb-2">${pickup.name}</h6>
+                                <p class="mb-1"><i class="fa fa-map-marker"></i> ${pickup.address}</p>
+                                <p class="mb-1"><strong>${pickup.formatted_charge}</strong></p>
+                                ${pickup.distance ? `<p class="mb-0 text-muted">${pickup.distance} km away</p>` : ''}
+                            </div>
+                        `;
+
+                        marker.bindPopup(popupContent);
+                        
+                        marker.on('click', () => {
+                            this.selectPickupPoint(pickup);
+                        });
+
+                        this.pickupMarkers.push(marker);
+                    });
+
+                    // Add user location marker if available
+                    if (this.userLocation) {
+                        const userIcon = L.divIcon({
+                            className: 'user-location-marker',
+                            html: '<i class="fa fa-location-arrow" style="color: #007bff; font-size: 20px;"></i>',
+                            iconSize: [20, 20],
+                            iconAnchor: [10, 10]
+                        });
+
+                        const userMarker = L.marker([this.userLocation.lat, this.userLocation.lng], {icon: userIcon})
+                            .addTo(this.pickupMap)
+                            .bindPopup('Your Location');
+
+                        this.pickupMarkers.push(userMarker);
+                    }
+                },
+
+                selectPickupPoint(pickup) {
+                    this.selectedPickupPoint = pickup;
+                    this.calculatePickupCharge();
+                    this.updateMapMarkers(); // Update marker colors
+                },
+
+                calculatePickupCharge() {
+                    if (!this.selectedPickupPoint?.id) {
+                        this.pickupExtraCharge = 0;
+                        return;
+                    }
+
+                    const quantities = this.getCurrentQuantities();
+
+                    $.ajax({
+                        url: "{{ route('front.tourbooking.pickup-points.calculate-charge') }}",
+                        method: 'POST',
+                        data: {
+                            pickup_point_id: this.selectedPickupPoint.id,
+                            age_quantities: quantities,
+                            _token: $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: (response) => {
+                            if (response.success) {
+                                this.pickupExtraCharge = response.extra_charge;
+                            }
+                        },
+                        error: (err) => {
+                            console.error('Error calculating pickup charge:', err);
+                            this.pickupExtraCharge = 0;
+                        }
+                    });
+                },
+
+                getCurrentQuantities() {
+                    if (Object.keys(this.tickets).length > 0) {
+                        return this.tickets;
+                    } else {
+                        return {
+                            adult: this.ticketsLegacy.person || 0,
+                            child: this.ticketsLegacy.children || 0,
+                            baby: 0,
+                            infant: 0
+                        };
+                    }
+                },
+
+                getCurrentLocation() {
+                    if (!navigator.geolocation) {
+                        alert('{{ __('translate.Geolocation is not supported by this browser') }}');
+                        return;
+                    }
+
+                    this.locationLoading = true;
+
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            this.userLocation = {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude
+                            };
+                            
+                            this.locationLoading = false;
+                            this.fetchPickupPoints(); // Refetch with location data
+                            
+                            if (this.pickupMap) {
+                                this.pickupMap.setView([this.userLocation.lat, this.userLocation.lng], 13);
+                            }
+                        },
+                        (error) => {
+                            this.locationLoading = false;
+                            console.error('Error getting location:', error);
+                            alert('{{ __('translate.Unable to get your location') }}');
+                        }
+                    );
                 },
 
                 fetchAvailabilityPricing(dateStr) {
@@ -1143,7 +1387,7 @@
                     });
                 },
 
-                // ===== Totals =====
+                // ===== Totals (updated to include pickup charges) =====
                 get totalCostAge() {
                     let total = 0;
                     for (const key in this.tickets) {
@@ -1165,6 +1409,14 @@
                         if (this.extras[key]) total += Number(this.extrasPrice[key] || 0);
                     }
                     return Number(total.toFixed(2));
+                },
+
+                get totalCostWithPickup() {
+                    return Number((this.totalCostAge + this.pickupExtraCharge).toFixed(2));
+                },
+
+                get totalCostLegacyWithPickup() {
+                    return Number((this.totalCostLegacy + this.pickupExtraCharge).toFixed(2));
                 },
 
                 // ===== Helpers =====
@@ -1194,6 +1446,7 @@
 @endpush
 
 @push('style_section')
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         a.tg-listing-item-wishlist.active { color: var(--tg-theme-primary); }
         .tg-tour-about-cus-review-thumb img { height: 128px; }
@@ -1218,6 +1471,109 @@
         .flatpickr-calendar.open .flatpickr-innerContainer .flatpickr-days .flatpickr-day.selected {
             color: var(--tg-common-white) !important;
             background-color: var(--tg-theme-primary) !important;
+        }
+
+        /* Pickup Points Styles */
+        .pickup-point-item {
+            border: 2px solid transparent;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .pickup-point-item:hover {
+            background: #e9ecef;
+            border-color: #dee2e6;
+        }
+
+        .pickup-point-item.selected {
+            background: #e3f2fd;
+            border-color: #2196f3;
+        }
+
+        .pickup-point-label {
+            cursor: pointer;
+            width: 100%;
+            margin: 0;
+            display: block;
+        }
+
+        .pickup-info {
+            margin-left: 8px;
+        }
+
+        .pickup-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .pickup-address {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        .pickup-details {
+            font-size: 12px;
+        }
+
+        .pickup-charge {
+            font-weight: 600;
+        }
+
+        .pickup-distance {
+            font-style: italic;
+        }
+
+        /* Map Styles */
+        #pickup-map-container {
+            border: 1px solid #dee2e6;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .leaflet-popup-content {
+            margin: 8px 12px;
+            line-height: 1.4;
+        }
+
+        .pickup-popup h6 {
+            margin: 0 0 8px 0;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .pickup-popup p {
+            margin: 0 0 4px 0;
+            font-size: 13px;
+        }
+
+        .custom-pickup-marker,
+        .user-location-marker {
+            background: none;
+            border: none;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            #pickup-map-container {
+                height: 250px !important;
+            }
+            
+            .pickup-point-item {
+                padding: 8px;
+            }
+            
+            .pickup-name {
+                font-size: 14px;
+            }
+            
+            .pickup-address {
+                font-size: 12px;
+            }
         }
     </style>
 @endpush

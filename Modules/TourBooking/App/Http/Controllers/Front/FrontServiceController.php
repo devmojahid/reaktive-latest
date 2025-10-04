@@ -15,6 +15,7 @@ use Modules\TourBooking\App\Models\AmenityTranslation;
 use Modules\TourBooking\App\Models\Availability;
 use Modules\TourBooking\App\Models\Booking;
 use Modules\TourBooking\App\Models\Destination;
+use Modules\TourBooking\App\Models\PickupPoint;
 use Modules\TourBooking\App\Models\Review;
 use Modules\TourBooking\App\Models\Service;
 use Modules\TourBooking\App\Models\ServiceType;
@@ -759,5 +760,83 @@ final class FrontServiceController extends Controller
             return substr($time, 0, 5);
         }
         return (string)$time; // fallback
+    }
+
+    /**
+     * Get pickup points for a service (API endpoint for frontend)
+     */
+    public function getPickupPoints(Request $request)
+    {
+        $request->validate([
+            'service_id' => 'required|integer|exists:services,id',
+            'user_lat'   => 'nullable|numeric|between:-90,90',
+            'user_lng'   => 'nullable|numeric|between:-180,180',
+        ]);
+
+        $service = Service::findOrFail($request->service_id);
+        
+        $pickupPoints = $service->activePickupPoints()
+            ->select('id', 'name', 'description', 'address', 'latitude', 'longitude', 'extra_charge', 'charge_type', 'is_default')
+            ->get();
+
+        // Calculate distances if user location provided
+        if ($request->user_lat && $request->user_lng) {
+            $userLat = (float) $request->user_lat;
+            $userLng = (float) $request->user_lng;
+
+            $pickupPoints = $pickupPoints->map(function ($pickup) use ($userLat, $userLng) {
+                $pickup->distance = $pickup->distanceFrom($userLat, $userLng);
+                return $pickup;
+            })->sortBy('distance');
+        }
+
+        $response = $pickupPoints->map(function ($pickup) {
+            return [
+                'id'           => $pickup->id,
+                'name'         => $pickup->name,
+                'description'  => $pickup->description,
+                'address'      => $pickup->address,
+                'coordinates'  => $pickup->coordinates,
+                'extra_charge' => $pickup->extra_charge,
+                'charge_type'  => $pickup->charge_type,
+                'formatted_charge' => $pickup->formatted_extra_charge,
+                'is_default'   => $pickup->is_default,
+                'distance'     => $pickup->distance ?? null,
+                'has_charge'   => $pickup->hasExtraCharge(),
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data'    => $response,
+        ]);
+    }
+
+    /**
+     * Calculate pickup point extra charge
+     */
+    public function calculatePickupCharge(Request $request)
+    {
+        $request->validate([
+            'pickup_point_id' => 'required|integer|exists:pickup_points,id',
+            'age_quantities'  => 'required|array',
+            'age_quantities.adult'  => 'integer|min:0',
+            'age_quantities.child'  => 'integer|min:0',
+            'age_quantities.baby'   => 'integer|min:0',
+            'age_quantities.infant' => 'integer|min:0',
+        ]);
+
+        $pickupPoint = PickupPoint::findOrFail($request->pickup_point_id);
+        $quantities = $request->age_quantities;
+
+        $extraCharge = $pickupPoint->calculateExtraCharge($quantities);
+
+        return response()->json([
+            'success'      => true,
+            'extra_charge' => $extraCharge,
+            'formatted'    => currency($extraCharge),
+            'pickup_name'  => $pickupPoint->name,
+            'charge_type'  => $pickupPoint->charge_type,
+        ]);
     }
 }
