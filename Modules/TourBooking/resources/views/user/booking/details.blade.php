@@ -195,6 +195,9 @@
                           <table>
                             <tr><td>{{ __('translate.Title') }}:</td><td>{{ $booking->service->title ?? '—' }}</td></tr>
                             <tr><td>{{ __('translate.Location') }}:</td><td>{{ $booking->service->location ?? '—' }}</td></tr>
+                            @if (!empty($booking->pickup_point_id))
+                                <tr><td>{{ __('translate.Pickup Point') }}:</td><td>{{ $booking->pickup_point_name ?? 'Selected' }}</td></tr>
+                            @endif
                             <tr><td>{{ __('translate.Adults') }}:</td><td>{{ (int)$booking->adults }}</td></tr>
                             <tr><td>{{ __('translate.Children') }}:</td><td>{{ (int)$booking->children }}</td></tr>
                           </table>
@@ -273,6 +276,14 @@
                                       <tr>
                                         <td>{{ __('translate.Extra charges') }}</td>
                                         <td class="text-end">{{ currency((float)$booking->extra_charges) }}</td>
+                                      </tr>
+                                    @endif
+
+                                    {{-- Pickup Point Charges --}}
+                                    @if (!empty($booking->pickup_point_id) && (float)($booking->pickup_charge ?? 0) > 0)
+                                      <tr>
+                                        <td>{{ __('translate.Pickup Point') }}: {{ $booking->pickup_point_name ?? 'Pickup Service' }}</td>
+                                        <td class="text-end">{{ currency((float)$booking->pickup_charge) }}</td>
                                       </tr>
                                     @endif
 

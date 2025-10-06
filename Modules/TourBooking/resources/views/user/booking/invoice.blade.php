@@ -244,6 +244,11 @@ $s = Cache::get('setting'); // vine din GlobalSettingController::set_cache_setti
                         <div class="muted" style="margin-top:8px;">Location</div>
                         <div>{{ $booking->service->location ?? '—' }}</div>
 
+                        @if (!empty($booking->pickup_point_id))
+                        <div class="muted" style="margin-top:8px;">Pickup Point</div>
+                        <div>{{ $booking->pickup_point_name ?? 'Selected' }}</div>
+                        @endif
+
                         <div class="muted" style="margin-top:8px;">Guests</div>
                         <div>Adults: {{ (int)$booking->adults }} &nbsp;·&nbsp; Children: {{ (int)$booking->children }}</div>
                     </div>
@@ -394,6 +399,11 @@ $s = Cache::get('setting'); // vine din GlobalSettingController::set_cache_setti
                           <div class="muted" style="margin-top:8px;">Location</div>
                           <div>{{ $booking->service->location ?? '—' }}</div>
 
+                          @if (!empty($booking->pickup_point_id))
+                          <div class="muted" style="margin-top:8px;">Pickup Point</div>
+                          <div>{{ $booking->pickup_point_name ?? 'Selected' }}</div>
+                          @endif
+
                           <div class="muted" style="margin-top:8px;">Guests</div>
                           <div>Adults: {{ (int)$booking->adults }} &nbsp;·&nbsp; Children: {{ (int)$booking->children }}</div>
                       </div>
@@ -463,6 +473,14 @@ $s = Cache::get('setting'); // vine din GlobalSettingController::set_cache_setti
                 <tr>
                     <td>Extra charges</td>
                     <td class="right">{{ __fmt_currency((float)$booking->extra_charges) }}</td>
+                </tr>
+            @endif
+
+            {{-- Pickup Point Charges --}}
+            @if (!empty($booking->pickup_point_id) && (float)($booking->pickup_charge ?? 0) > 0)
+                <tr>
+                    <td>Pickup Point: {{ $booking->pickup_point_name ?? 'Pickup Service' }}</td>
+                    <td class="right">{{ __fmt_currency((float)$booking->pickup_charge) }}</td>
                 </tr>
             @endif
 

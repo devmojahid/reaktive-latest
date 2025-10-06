@@ -19,6 +19,35 @@ $s = Cache::get('setting'); // vine din GlobalSettingController::set_cache_setti
         }
     }
 
+    // Normalize JSON/array fields for age breakdown
+    $decode = function ($v) {
+        if (is_array($v)) return $v;
+        if (is_string($v)) {
+            $d = json_decode($v, true);
+            return json_last_error() === JSON_ERROR_NONE ? ($d ?: []) : [];
+        }
+        return [];
+    };
+
+    $ageBreakdown = $decode($booking->age_breakdown ?? []);
+    $ageQuantities = $decode($booking->age_quantities ?? []);
+    $ageConfig     = $decode($booking->age_config ?? []);
+
+    if (empty($ageBreakdown) && !empty($ageQuantities)) {
+        foreach ($ageQuantities as $k => $qty) {
+            $qty = (int)$qty;
+            if ($qty <= 0) continue;
+            $label = $ageConfig[$k]['label'] ?? ucfirst((string)$k);
+            $price = (float)($ageConfig[$k]['price'] ?? 0);
+            $ageBreakdown[$k] = [
+                'label' => $label,
+                'qty'   => $qty,
+                'price' => $price,
+                'line'  => $price * $qty,
+            ];
+        }
+    }
+
     // ==== Billed From (supplier) din setări ====
     // folosim cheile: invoice_company_name, *_address_line1, *_address_line2, *_zip, *_city, *_state, *_country,
     // *_vat_id, *_reg_no, *_eori, *_iban, *_bank_name, *_email, *_phone
@@ -244,6 +273,11 @@ $s = Cache::get('setting'); // vine din GlobalSettingController::set_cache_setti
                         <div class="muted" style="margin-top:8px;">Location</div>
                         <div>{{ $booking->service->location ?? '—' }}</div>
 
+                        @if (!empty($booking->pickup_point_id))
+                        <div class="muted" style="margin-top:8px;">Pickup Point</div>
+                        <div>{{ $booking->pickup_point_name ?? 'Selected' }}</div>
+                        @endif
+
                         <div class="muted" style="margin-top:8px;">Guests</div>
                         <div>Adults: {{ (int)$booking->adults }} &nbsp;·&nbsp; Children: {{ (int)$booking->children }}</div>
                     </div>
@@ -394,6 +428,11 @@ $s = Cache::get('setting'); // vine din GlobalSettingController::set_cache_setti
                           <div class="muted" style="margin-top:8px;">Location</div>
                           <div>{{ $booking->service->location ?? '—' }}</div>
 
+                          @if (!empty($booking->pickup_point_id))
+                          <div class="muted" style="margin-top:8px;">Pickup Point</div>
+                          <div>{{ $booking->pickup_point_name ?? 'Selected' }}</div>
+                          @endif
+
                           <div class="muted" style="margin-top:8px;">Guests</div>
                           <div>Adults: {{ (int)$booking->adults }} &nbsp;·&nbsp; Children: {{ (int)$booking->children }}</div>
                       </div>
@@ -463,6 +502,14 @@ $s = Cache::get('setting'); // vine din GlobalSettingController::set_cache_setti
                 <tr>
                     <td>Extra charges</td>
                     <td class="right">{{ __fmt_currency((float)$booking->extra_charges) }}</td>
+                </tr>
+            @endif
+
+            {{-- Pickup Point Charges --}}
+            @if (!empty($booking->pickup_point_id) && (float)($booking->pickup_charge ?? 0) > 0)
+                <tr>
+                    <td>Pickup Point: {{ $booking->pickup_point_name ?? 'Pickup Service' }}</td>
+                    <td class="right">{{ __fmt_currency((float)$booking->pickup_charge) }}</td>
                 </tr>
             @endif
 
