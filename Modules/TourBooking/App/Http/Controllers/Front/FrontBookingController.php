@@ -32,6 +32,14 @@ final class FrontBookingController extends Controller
      */
     public function bookingCheckoutView(Request $request)
     {
+        // === COMPREHENSIVE REQUEST DEBUG ===
+        Log::info('=== CHECKOUT CONTROLLER START ===', [
+            'full_url' => $request->fullUrl(),
+            'method' => $request->method(),
+            'all_parameters' => $request->all(),
+            'session_id' => session()->getId(),
+        ]);
+
         // Store intended URL if coming from booking process
         if ($request->has('intended_from') && $request->intended_from === 'booking') {
             $intendedUrl = url()->current() . '?' . http_build_query($request->except(['intended_from']));
@@ -123,12 +131,28 @@ final class FrontBookingController extends Controller
         // === Pickup Point Charges =============================================
         $pickupCharge = 0.0;
         $pickupPointName = null;
+        
+        // DEBUG: Add logging to identify server issue
+        Log::info('=== PICKUP POINT PROCESSING START ===');
+        Log::info('Pickup Debug - Request pickup_point_id: ' . ($request->pickup_point_id ?? 'NULL'));
+        Log::info('Pickup Debug - Request filled check: ' . ($request->filled('pickup_point_id') ? 'YES' : 'NO'));
+        Log::info('Pickup Debug - All request data: ', $request->all());
+        
         if ($request->filled('pickup_point_id')) {
             $pickupPoint = PickupPoint::find($request->pickup_point_id);
-            if ($pickupPoint && $pickupPoint->service_id === $service->id) {
-                $pickupCharge = $pickupPoint->calculateExtraCharge($qty);
-                $pickupPointName = $pickupPoint->name;
+            Log::info('Pickup Debug - PickupPoint found: ' . ($pickupPoint ? 'YES (ID: '.$pickupPoint->id.')' : 'NO'));
+            
+            if ($pickupPoint) {
+                Log::info('Pickup Debug - Service match: ' . ($pickupPoint->service_id === $service->id ? 'YES' : 'NO') . ' (PP Service: '.$pickupPoint->service_id.', Current Service: '.$service->id.')');
+                
+                if ($pickupPoint->service_id === $service->id) {
+                    $pickupCharge = $pickupPoint->calculateExtraCharge($qty);
+                    $pickupPointName = $pickupPoint->name;
+                    Log::info('Pickup Debug - Calculated charge: ' . $pickupCharge . ', Name: ' . $pickupPointName);
+                }
             }
+        } else {
+            Log::info('Pickup Debug - pickup_point_id not filled in request');
         }
 
         // === PREȚURI unitare pe categorii (folosim Service model methods) ==
@@ -186,6 +210,12 @@ final class FrontBookingController extends Controller
         }
 
         // Pickup Point Charge
+        Log::info('=== ADDING PICKUP TO LINES ===', [
+            'pickupCharge' => $pickupCharge,
+            'pickupPointName' => $pickupPointName,
+            'condition_met' => ($pickupCharge > 0 && $pickupPointName)
+        ]);
+        
         if ($pickupCharge > 0 && $pickupPointName) {
             $lines[] = [
                 'label'    => 'Pickup: ' . $pickupPointName,
@@ -196,6 +226,14 @@ final class FrontBookingController extends Controller
                 'is_extra' => true,
             ];
             $total += $pickupCharge;
+            Log::info('Pickup Debug - Added pickup line to order', ['pickup_charge' => $pickupCharge]);
+        } else {
+            Log::info('Pickup Debug - Pickup line NOT added', [
+                'pickupCharge' => $pickupCharge,
+                'pickupPointName' => $pickupPointName,
+                'charge_greater_than_zero' => ($pickupCharge > 0),
+                'name_exists' => !empty($pickupPointName)
+            ]);
         }
 
         // Compat vechi (person/children)
@@ -259,6 +297,18 @@ final class FrontBookingController extends Controller
             'pickup_point_id' => $request->pickup_point_id,
             'pickup_charge'   => $pickupCharge,
             'pickup_point_name' => $pickupPointName,
+        ]);
+
+        // Final debug before returning view
+        Log::info('=== FINAL VIEW DATA ===', [
+            'lines_count' => count($lines),
+            'lines_data' => $lines,
+            'total' => $total,
+            'pickup_in_session' => [
+                'pickup_point_id' => $request->pickup_point_id,
+                'pickup_charge' => $pickupCharge,
+                'pickup_point_name' => $pickupPointName
+            ]
         ]);
 
         return view('tourbooking::front.bookings.checkout-view', [
