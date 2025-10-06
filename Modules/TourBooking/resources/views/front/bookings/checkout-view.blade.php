@@ -85,6 +85,7 @@
 
                                 @php
                                     $extraLines = collect($ticketLines)->filter(fn($line) => $line['is_extra'] ?? false);
+                                    dump($extraLines);
                                 @endphp
                                 @if($extraLines->count() > 0)
                                     <div class="tg-tour-about-extra mb-10">
