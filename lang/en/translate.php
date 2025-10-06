@@ -1721,5 +1721,8 @@
   'Pickup point added successfully' => 'Pickup point added successfully',
   'Pickup point updated successfully' => 'Pickup point updated successfully',
   'Pickup point deleted successfully' => 'Pickup point deleted successfully',
+  'Pickup Points' => 'Pickup Points',
+  'Availability added successfully' => 'Availability added successfully',
+  'Leave empty for unlimited' => 'Leave empty for unlimited',
   
 );
