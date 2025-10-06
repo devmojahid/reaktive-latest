@@ -143,9 +143,9 @@ final class FrontBookingController extends Controller
             Log::info('Pickup Debug - PickupPoint found: ' . ($pickupPoint ? 'YES (ID: '.$pickupPoint->id.')' : 'NO'));
             
             if ($pickupPoint) {
-                Log::info('Pickup Debug - Service match: ' . ($pickupPoint->service_id === $service->id ? 'YES' : 'NO') . ' (PP Service: '.$pickupPoint->service_id.', Current Service: '.$service->id.')');
+                Log::info('Pickup Debug - Service match: ' . ((int)$pickupPoint->service_id === (int)$service->id ? 'YES' : 'NO') . ' (PP Service: '.$pickupPoint->service_id.', Current Service: '.$service->id.')');
                 
-                if ($pickupPoint->service_id === $service->id) {
+                if ((int)$pickupPoint->service_id === (int)$service->id) {
                     $pickupCharge = $pickupPoint->calculateExtraCharge($qty);
                     $pickupPointName = $pickupPoint->name;
                     Log::info('Pickup Debug - Calculated charge: ' . $pickupCharge . ', Name: ' . $pickupPointName);
