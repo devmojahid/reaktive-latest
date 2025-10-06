@@ -547,7 +547,7 @@
                     {{-- ========================= BOOK NOW SIDEBAR ========================= --}}
                     <div class="col-xl-3 col-lg-4">
                         <div x-data="bookingForm()" class="tg-tour-about-sidebar top-sticky mb-50">
-                            <form action="{{ route('front.tourbooking.book.checkout.view') }}" method="GET">
+                            <form action="{{ route('front.tourbooking.book.checkout.view') }}" method="GET" @submit="validateAndSubmit($event)">
                                 <h4 class="tg-tour-about-title title-2 mb-15">Book Now</h4>
 
                                 <input type="hidden" name="service_id" value="{{ $service->id }}">
@@ -1616,6 +1616,35 @@
                     const options = { size: 50, maxSize: 50, minSize: 50 };
                     if (target && typeof target === 'string') $(target).LoadingOverlay(action, options);
                     else $.LoadingOverlay(action, options);
+                },
+
+                // ===== Form Validation =====
+                validateAndSubmit(event) {
+                    // Check if we have age-based pricing
+                    const hasAgePricing = Object.keys(this.ageConfig || {}).length > 0;
+                    
+                    if (hasAgePricing) {
+                        // Check if at least one ticket is selected
+                        const totalTickets = Object.values(this.tickets || {}).reduce((sum, qty) => sum + (Number(qty) || 0), 0);
+                        
+                        if (totalTickets === 0) {
+                            event.preventDefault();
+                            alert('{{ __('Please select at least one ticket before proceeding to checkout.') }}');
+                            return false;
+                        }
+                    } else {
+                        // For legacy per-person pricing, check person count
+                        const totalPersons = (Number(this.ticketsLegacy.person) || 0) + (Number(this.ticketsLegacy.children) || 0);
+                        
+                        if (totalPersons === 0) {
+                            event.preventDefault();
+                            alert('{{ __('Please select at least one person before proceeding to checkout.') }}');
+                            return false;
+                        }
+                    }
+                    
+                    // If validation passes, allow form submission
+                    return true;
                 }
             };
         }
