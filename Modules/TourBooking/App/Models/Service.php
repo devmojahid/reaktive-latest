@@ -46,8 +46,6 @@ final class Service extends Model
         'duration',
         'group_size',
         'languages',
-        'check_in_time',
-        'check_out_time',
         'ticket',
         'amenities',
         'facilities',
@@ -76,14 +74,8 @@ final class Service extends Model
 
         // Ownership
         'user_id',
-
-        // Date range (pentru listări)
-        'check_in_date',
-        'check_out_date',
-
         // UI
         'tour_plan_sub_title',
-        'room_count',
         'adult_count',
         'children_count',
     ];
@@ -116,9 +108,6 @@ final class Service extends Model
         'status'              => 'boolean',
         'is_new'              => 'boolean',
         'is_per_person'       => 'boolean',
-
-        'check_in_date'       => 'date',
-        'check_out_date'      => 'date',
     ];
 
     /* =========================================================

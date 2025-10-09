@@ -45,10 +45,6 @@ final class BookingController extends Controller
         $validated = $request->validate([
             'service_id' => 'required|exists:services,id',
             'user_id' => 'required|exists:users,id',
-            'check_in_date' => 'required|date',
-            'check_out_date' => 'nullable|date|after_or_equal:check_in_date',
-            'check_in_time' => 'nullable',
-            'check_out_time' => 'nullable',
             'adults' => 'required|integer|min:1',
             'children' => 'nullable|integer|min:0',
             'infants' => 'nullable|integer|min:0',
@@ -117,10 +113,6 @@ final class BookingController extends Controller
     {
         $validated = $request->validate([
             'service_id' => 'required|exists:services,id',
-            'check_in_date' => 'required|date',
-            'check_out_date' => 'nullable|date|after_or_equal:check_in_date',
-            'check_in_time' => 'nullable',
-            'check_out_time' => 'nullable',
             'adults' => 'required|integer|min:1',
             'children' => 'nullable|integer|min:0',
             'infants' => 'nullable|integer|min:0',

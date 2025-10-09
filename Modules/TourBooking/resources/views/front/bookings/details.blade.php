@@ -86,12 +86,6 @@
                                 <p><strong>{{ __('translate.Service') }}:</strong> {{ $booking->service->title }}</p>
                                 <p><strong>{{ __('translate.Type') }}:</strong>
                                     {{ $booking->service->serviceType->name ?? 'N/A' }}</p>
-                                <p><strong>{{ __('translate.Check-in Date') }}:</strong>
-                                    {{ date('d M Y', strtotime($booking->check_in_date)) }}</p>
-                                @if ($booking->check_out_date)
-                                    <p><strong>{{ __('translate.Check-out Date') }}:</strong>
-                                        {{ date('d M Y', strtotime($booking->check_out_date)) }}</p>
-                                @endif>
 
                                 {{-- Dacă avem categorii de vârstă salvate, afișăm tabelul pe categorii.
                                      Altfel, rămâne afișarea clasică (adulți/copii/infants) EXACT cum era. --}}

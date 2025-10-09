@@ -276,12 +276,6 @@
                                                         <div class="detail-value">{{ $service->group_size ?: 'Not set' }}</div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6">
-                                                    <div class="detail-item">
-                                                        <div class="detail-label">{{ __('translate.Room Count') }}</div>
-                                                        <div class="detail-value">{{ $service->room_count ?: 'Not set' }}</div>
-                                                    </div>
-                                                </div>
 
                                                 {{-- Age Categories (read-only list) --}}
                                                 @if(is_array($service->age_categories) && count($service->age_categories))

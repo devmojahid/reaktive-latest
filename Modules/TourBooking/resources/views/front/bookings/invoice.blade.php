@@ -193,19 +193,6 @@
                 <div><strong>{{ $service->title }}</strong></div>
                 @if($service->location)<div class="muted">{{ $service->location }}</div>@endif
             </div>
-            <div class="col col-6 right">
-                <h4 class="mb-2">{{ __('translate.Dates') }}</h4>
-                <div><strong>{{ __('translate.Check-in Date') }}:</strong> {{ \Carbon\Carbon::parse($booking->check_in_date)->format('d M Y') }}</div>
-                @if($booking->check_out_date)
-                    <div><strong>{{ __('translate.Check-out Date') }}:</strong> {{ \Carbon\Carbon::parse($booking->check_out_date)->format('d M Y') }}</div>
-                @endif
-                @if($booking->check_in_time)
-                    <div><strong>{{ __('translate.Check-in Time') }}:</strong> {{ $booking->check_in_time }}</div>
-                @endif
-                @if($booking->check_out_time)
-                    <div><strong>{{ __('translate.Check-out Time') }}:</strong> {{ $booking->check_out_time }}</div>
-                @endif
-            </div>
         </div>
     </div>
 

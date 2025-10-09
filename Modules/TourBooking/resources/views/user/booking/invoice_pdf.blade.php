@@ -60,10 +60,6 @@
         <table>
           <tr><td>Invoice No</td><td>#{{ $booking->booking_code }}</td></tr>
           <tr><td>Payment Method</td><td>{{ $booking->payment_method ? ucfirst($booking->payment_method) : '—' }}</td></tr>
-          <tr><td>Check in Date</td><td>{{ \Carbon\Carbon::parse($booking->check_in_date)->format('d M Y') }}</td></tr>
-          @if ($booking->check_out_date)
-            <tr><td>Check out Date</td><td>{{ \Carbon\Carbon::parse($booking->check_out_date)->format('d M Y') }}</td></tr>
-          @endif
         </table>
       </div>
     </div>

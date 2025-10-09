@@ -211,18 +211,6 @@
                                                 <div class="col-lg-4 col-md-6 col-12">
                                                     <div class="crancy__item-form--group mg-top-form-20">
                                                         <label
-                                                            class="crancy__item-label">{{ __('translate.Room Count') }}</label>
-                                                        <input class="crancy__item-input" type="number" name="room_count"
-                                                            value="{{ old('room_count', 1) }}" placeholder="1">
-                                                        @error('room_count')
-                                                            <span class="text-danger">{{ $message }}</span>
-                                                        @enderror
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-lg-4 col-md-6 col-12">
-                                                    <div class="crancy__item-form--group mg-top-form-20">
-                                                        <label
                                                             class="crancy__item-label">{{ __('translate.Adult Count') }}</label>
                                                         <input class="crancy__item-input" type="number" name="adult_count"
                                                             value="{{ old('adult_count', 1) }}" placeholder="1">

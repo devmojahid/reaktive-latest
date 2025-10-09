@@ -119,7 +119,6 @@ class ServiceRequest extends FormRequest
             'seo_description' => 'nullable|string|max:500',
             'seo_keywords' => 'nullable|string|max:255',
             'lang_code' => 'nullable|string|exists:languages,lang_code',
-            'room_count' => 'nullable|integer|min:0',
             'adult_count' => 'nullable|integer|min:0',
             'children_count' => 'nullable|integer|min:0',
             'tour_plan_sub_title' => 'nullable|max:255',

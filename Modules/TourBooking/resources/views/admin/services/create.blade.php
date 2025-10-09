@@ -160,14 +160,6 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-lg-4 col-md-6 col-12">
-                                        <div class="crancy__item-form--group mg-top-form-20">
-                                            <label class="crancy__item-label">{{ __('Tour Count') }}</label>
-                                            <input class="crancy__item-input" type="number" name="room_count" value="{{ old('room_count', 1) }}" placeholder="1">
-                                            @error('room_count') <span class="text-danger">{{ $message }}</span> @enderror
-                                        </div>
-                                    </div>
-
                                     {{-- ===================== Age Categories ===================== --}}
                                     @php
                                         $ageCategories = [
@@ -362,38 +354,6 @@
                             </div>
                             <div class="crancy-card__body">
                                 <div class="row">
-                                    <div class="col-lg-6 col-md-6 col-12">
-                                        <div class="crancy__item-form--group mg-top-form-20">
-                                            <label class="crancy__item-label">{{ __('translate.Check in Date') }}</label>
-                                            <input class="crancy__item-input timepicker-date" type="text" name="check_in_date" value="{{ old('check_in_date') }}" placeholder="Select date" autocomplete="off">
-                                            @error('check_in_date') <span class="text-danger">{{ $message }}</span> @enderror
-                                        </div>
-                                    </div>
-
-                                    <div class="col-lg-6 col-md-6 col-12">
-                                        <div class="crancy__item-form--group mg-top-form-20">
-                                            <label class="crancy__item-label">{{ __('translate.Check Out Date') }}</label>
-                                            <input class="crancy__item-input timepicker-date" type="text" name="check_out_date" value="{{ old('check_out_date') }}" placeholder="Select date" autocomplete="off">
-                                            @error('check_out_date') <span class="text-danger">{{ $message }}</span> @enderror
-                                        </div>
-                                    </div>
-
-                                    <div class="col-lg-6 col-md-6 col-12">
-                                        <div class="crancy__item-form--group mg-top-form-20">
-                                            <label class="crancy__item-label">{{ __('translate.Check-in Time') }}</label>
-                                            <input class="crancy__item-input timepicker" type="text" name="check_in_time" value="{{ old('check_in_time') }}" placeholder="e.g. 14:00" autocomplete="off">
-                                            @error('check_in_time') <span class="text-danger">{{ $message }}</span> @enderror
-                                        </div>
-                                    </div>
-
-                                    <div class="col-lg-6 col-md-6 col-12">
-                                        <div class="crancy__item-form--group mg-top-form-20">
-                                            <label class="crancy__item-label">{{ __('translate.Check-out Time') }}</label>
-                                            <input class="crancy__item-input timepicker" type="text" name="check_out_time" value="{{ old('check_out_time') }}" placeholder="e.g. 10:00" autocomplete="off">
-                                            @error('check_out_time') <span class="text-danger">{{ $message }}</span> @enderror
-                                        </div>
-                                    </div>
-
                                     <div class="col-lg-6 col-md-6 col-12">
                                         <div class="crancy__item-form--group mg-top-form-20">
                                             <label class="crancy__item-label">{{ __('translate.Ticket') }}</label>

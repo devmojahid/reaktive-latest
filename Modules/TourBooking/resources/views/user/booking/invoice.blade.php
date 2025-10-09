@@ -209,14 +209,6 @@ $s = Cache::get('setting'); // vine din GlobalSettingController::set_cache_setti
 
                 <div class="muted" style="margin-top:8px;">Payment Method</div>
                 <div>{{ $booking->payment_method ? ucfirst($booking->payment_method) : '—' }}</div>
-
-                <div class="muted" style="margin-top:8px;">Check in</div>
-                <div>{{ $fmtDate($booking->check_in_date) }}</div>
-
-                @if($booking->check_out_date)
-                <div class="muted" style="margin-top:8px;">Check out</div>
-                <div>{{ $fmtDate($booking->check_out_date) }}</div>
-                @endif
             </div>
         </div>
 

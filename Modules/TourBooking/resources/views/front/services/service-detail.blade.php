@@ -606,25 +606,10 @@
                                     </div>
                                     <div class="tg-tour-about-border-doted mb-15"></div>
                                 @elseif ($service->is_per_person)
-                                    <div class="tg-tour-about-time d-flex align-items-center mb-10 d-none">
-                                        <span class="time">Time:</span>
-                                        <div class="form-check mr-15">
-                                            <input type="hidden" name="check_in_time_hidden" value="{{ $service->check_in_time }}">
-                                            <input class="form-check-input" name="check_in_time" type="radio" id="time1">
-                                            <label class="form-check-label" for="time1">{{ $service->check_in_time }}</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input type="hidden" name="check_out_time_hidden" value="{{ $service->check_out_time }}">
-                                            <input class="form-check-input" name="check_out_time" type="radio" id="time2">
-                                            <label class="form-check-label" for="time2">{{ $service->check_out_time }}</label>
-                                        </div>
-                                    </div>
-
                                     <div class="tg-tour-about-border-doted mb-15"></div>
 
                                     <div class="tg-tour-about-tickets-wrap mb-15">
                                         <span class="tg-tour-about-sidebar-title">Tickets:</span>
-
                                         <div class="tg-tour-about-tickets mb-10">
                                             <div class="tg-tour-about-tickets-adult">
                                                 <span>Person</span>

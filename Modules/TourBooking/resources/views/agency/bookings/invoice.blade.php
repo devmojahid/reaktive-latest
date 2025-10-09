@@ -244,11 +244,6 @@
                 <p>{{ __('translate.Tour Type') }}:
                     {{ $booking->service->serviceType->translation->name ?? $booking->service->serviceType->name }}</p>
                 <p>{{ __('translate.Location') }}: {{ $booking->service->location }}</p>
-                <p>{{ __('translate.Check in Date') }}: {{ date('d M Y', strtotime($booking->check_in_date)) }}</p>
-                @if ($booking->check_out_date)
-                    <p>{{ __('translate.Check out Date') }}: {{ date('d M Y', strtotime($booking->check_out_date)) }}
-                    </p>
-                @endif
                 <p>{{ __('translate.Duration') }}: {{ $booking->service->duration }}</p>
             </div>
 

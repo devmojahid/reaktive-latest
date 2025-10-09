@@ -281,10 +281,6 @@ final class FrontBookingController extends Controller
         session()->forget('payment_cart');
         session()->put('payment_cart', [
             'service_id'      => $service->id,
-            'check_in_date'   => $date,
-            'check_out_date'  => $request->check_out_date,
-            'check_in_time'   => $request->check_in_time == 'on' ? $request->check_in_time_hidden : null,
-            'check_out_time'  => $request->check_out_time == 'on' ? $request->check_out_time_hidden : null,
             'person_count'    => 0,
             'child_count'     => 0,
             'age_quantities'  => $qty,

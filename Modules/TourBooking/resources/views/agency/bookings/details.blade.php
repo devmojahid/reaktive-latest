@@ -155,34 +155,7 @@
                                                                 <td>{{ __('translate.Location') }} : </td>
                                                                 <td>{{ $booking?->service?->location }}</td>
                                                             </tr>
-                                                            <tr>
-                                                                <td>{{ __('translate.Check in Date') }}:</td>
-                                                                <td>{{ date('d M Y', strtotime($booking->check_in_date)) }}
-                                                                </td>
-                                                            </tr>
-                                                            @if ($booking->check_out_date)
-                                                                <tr>
-                                                                    <td>{{ __('translate.Check out Date') }}:</td>
-                                                                    <td>{{ date('d M Y', strtotime($booking->check_out_date)) }}
-                                                                    </td>
-                                                                </tr>
-                                                            @endif
-
-                                                            @if ($booking->check_in_time)
-                                                                <tr>
-                                                                    <td>{{ __('translate.Check in Time') }}:</td>
-                                                                    <td>{{ \Carbon\Carbon::parse($booking->check_in_time)->format('h:i A') }}
-                                                                    </td>
-                                                                </tr>
-                                                            @endif
-
-                                                            @if ($booking->check_out_time)
-                                                                <tr>
-                                                                    <td>{{ __('translate.Check out Time') }}:</td>
-                                                                    <td>{{ \Carbon\Carbon::parse($booking->check_out_time)->format('h:i A') }}
-                                                                    </td>
-                                                                </tr>
-                                                            @endif
+                                                            
 
                                                             <tr>
                                                                 <td>{{ __('translate.Adults') }} : </td>
