@@ -24,10 +24,6 @@ final class Booking extends Model
         'booking_code',
         'service_id',
         'user_id',
-        'check_in_date',
-        'check_out_date',
-        'check_in_time',
-        'check_out_time',
         'adults',
         'children',
         'infants',
@@ -75,10 +71,6 @@ final class Booking extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'check_in_date' => 'date',
-        'check_out_date' => 'date',
-        'check_in_time' => 'datetime',
-        'check_out_time' => 'datetime',
         'adults' => 'integer',
         'children' => 'integer',
         'infants' => 'integer',

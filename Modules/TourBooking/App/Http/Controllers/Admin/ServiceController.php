@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Modules\Language\App\Models\Language;
@@ -62,8 +63,12 @@ final class ServiceController extends Controller
     {
         $data = $request->validated();
 
+        Log::info('Age categories validated data', $request->validated()['age_categories']);
+
         // === Age categories (normalize + validate) ===
         $data['age_categories'] = $this->normalizeAgeCategories($request->validated()['age_categories'] ?? []);
+
+        Log::info('Age categories normalized data', $data['age_categories']);
 
         // JSON fields
         foreach (['included','excluded','facilities','rules','safety','social_links'] as $field) {

@@ -557,10 +557,6 @@ class PaymentController extends Controller
         $order->booking_code   = uniqid();
         $order->service_id     = $service->id;
         $order->user_id        = $user->id;
-        $order->check_in_date  = $payment_cart['check_in_date'];
-        $order->check_out_date = $payment_cart['check_out_date'];
-        $order->check_in_time  = $payment_cart['check_in_time'];
-        $order->check_out_time = $payment_cart['check_out_time'];
         $order->adults         = $adults;
         $order->children       = $children;
 

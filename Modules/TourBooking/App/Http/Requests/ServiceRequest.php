@@ -147,6 +147,10 @@ class ServiceRequest extends FormRequest
                 $enabled = (int)($cat['enabled'] ?? 0) === 1;
 
                 $prefix = "age_categories.$key";
+                
+                // Add validation rule for enabled field
+                $rules["$prefix.enabled"] = ['nullable', 'boolean'];
+                
                 if ($enabled) {
                     $rules["$prefix.price"]   = ['required', 'numeric', 'min:0'];
                     $rules["$prefix.count"]   = ['required', 'integer', 'min:0'];
