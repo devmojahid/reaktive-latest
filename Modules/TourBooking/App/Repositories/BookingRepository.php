@@ -56,10 +56,6 @@ final class BookingRepository
             $query->whereBetween('created_at', [$filters['start_date'], $filters['end_date']]);
         }
 
-        if (!empty($filters['check_in_date'])) {
-            $query->where('check_in_date', $filters['check_in_date']);
-        }
-
         return $query->orderBy('id', 'desc')->paginate($perPage);
     }
 
@@ -139,7 +135,7 @@ final class BookingRepository
     {
         return Booking::with(['service.translation', 'user'])
             ->forDateRange($startDate, $endDate)
-            ->orderBy('check_in_date')
+            ->orderBy('created_at')
             ->get();
     }
 

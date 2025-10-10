@@ -126,8 +126,6 @@ class ServiceRequest extends FormRequest
             'google_map_url' => 'nullable',
             'is_per_person' => 'nullable',
             'trip_types' => 'nullable',
-            'check_in_date' => 'nullable|date',
-            'check_out_date' => 'nullable|date',
 
             // NEW: container pentru age categories
             'age_categories' => 'nullable|array',
