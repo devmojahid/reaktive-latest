@@ -681,7 +681,7 @@
                                         {{-- Selected Pickup Display --}}
                                         <div class="selected-pickup-display mb-3">
                                             <div x-show="!selectedPickupPoint" class="no-pickup-selected">
-                                                <div class="pickup-placeholder d-flex align-items-center justify-content-between p-3" style="background: #f8f9fa; border: 1px dashed #dee2e6; border-radius: 8px; cursor: pointer;" @click="console.log('Placeholder clicked, showPickupModal:', showPickupModal); showPickupModal = true; console.log('After placeholder click:', showPickupModal)">
+                                                <div class="pickup-placeholder d-flex align-items-center justify-content-between p-3" style="background: #f8f9fa; border: 1px dashed #dee2e6; border-radius: 8px; cursor: pointer;">
                                                     <div>
                                                         <i class="fa fa-map-marker text-muted me-2"></i>
                                                         <span class="text-muted">{{ __('No pickup point selected') }}</span>
@@ -691,7 +691,7 @@
                                             </div>
                                             
                                             <div x-show="selectedPickupPoint" class="selected-pickup-card">
-                                                <div class="pickup-selected-card d-flex align-items-center justify-content-between p-3" style="background: #e3f2fd; border: 1px solid #2196f3; border-radius: 8px; cursor: pointer;" @click="console.log('Selected card clicked, showPickupModal:', showPickupModal); showPickupModal = true; console.log('After selected click:', showPickupModal)">
+                                                <div class="pickup-selected-card d-flex align-items-center justify-content-between p-3" style="background: #e3f2fd; border: 1px solid #2196f3; border-radius: 8px; cursor: pointer;">
                                                     <div class="selected-info">
                                                         <div class="d-flex align-items-center mb-1">
                                                             <i class="fa fa-map-marker text-primary me-2"></i>
@@ -746,7 +746,12 @@
                             </form>
 
                             {{-- ===== PICKUP POINT SELECTION MODAL ===== --}}
-                            <div x-show="showPickupModal" x-init="console.log('Modal element initialized, showPickupModal:', showPickupModal)" class="pickup-modal-overlay" @click.self="showPickupModal = false" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px;" x-cloak>
+                            <div x-show="showPickupModal" 
+                                x-init="console.log('Modal element initialized, showPickupModal:', showPickupModal)" 
+                                class="pickup-modal-overlay" 
+                                @click.self="showPickupModal = false" 
+                                style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; overflow-y: auto;" 
+                                x-cloak>
                                 <div class="pickup-modal-content" style="background: white; border-radius: 12px; width: 100%; max-width: 900px; max-height: 90vh; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
                                     {{-- Modal Header --}}
                                     <div class="pickup-modal-header d-flex align-items-center justify-content-between p-4" style="border-bottom: 1px solid #dee2e6; background: #f8f9fa;">
@@ -761,7 +766,7 @@
                                     </div>
 
                                     {{-- Modal Body --}}
-                                    <div class="pickup-modal-body" style="height: 70vh; overflow: hidden; display: flex; flex-direction: column;">
+                                    <div class="pickup-modal-body" style="height: 50vh; overflow: hidden; display: flex; flex-direction: column;">
                                         {{-- Location Actions --}}
                                         <div class="pickup-location-bar d-flex align-items-center justify-content-between p-3" style="background: #f1f3f4; border-bottom: 1px solid #dee2e6;">
                                             <div class="location-status">
@@ -1276,6 +1281,15 @@
                             this.calculatePickupCharge();
                         }
                     }, { deep: true });
+
+                    // scroll disable
+                    this.$watch('showPickupModal', (isOpen) => {
+                        if (isOpen) {
+                            document.body.style.overflow = 'hidden';
+                        } else {
+                            document.body.style.overflow = '';
+                        }
+                    });
                 },
 
                 // ===== Pickup Points Methods =====
@@ -1547,7 +1561,6 @@
                     // Update modal map markers to reflect selection
                     this.updateModalMapMarkers();
                     
-                    console.log('Pickup point selected in modal:', pickup.name, 'Charge:', this.pickupExtraCharge);
                 },
 
                 clearPickupPointModal() {
@@ -1558,7 +1571,6 @@
 
                 confirmPickupSelection() {
                     this.showPickupModal = false;
-                    console.log('Pickup selection confirmed:', this.selectedPickupPoint?.name || 'None');
                 },
 
                 clearPickupPoint() {
@@ -1580,7 +1592,6 @@
                     }
 
                     const quantities = this.getCurrentQuantities();
-                    console.log('Calculating pickup charge for:', this.selectedPickupPoint.name, 'Quantities:', quantities);
 
                     // Show loading state
                     this.pickupLoading = true;
@@ -1906,6 +1917,23 @@
             border-color: #0c5460 !important;
         }
 
+        .pickup-modal-overlay {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            z-index: 999999 !important; /* Higher z-index to prevent overlap */
+            background: rgba(0, 0, 0, 0.6) !important;
+            backdrop-filter: blur(3px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px !important;
+        }
+
+       
+
         .pickup-modal-overlay[x-cloak] {
             display: none !important;
         }
@@ -1981,6 +2009,10 @@
             background: rgba(255, 255, 255, 0.9);
             border-radius: 8px;
             z-index: 10;
+        }
+
+        .pickup-location-bar{
+            display: none !important;
         }
 
         .pickup-points-list {
@@ -2112,7 +2144,7 @@
         .enhanced-popup .leaflet-popup-content-wrapper {
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
+        }            
 
         /* Mobile Responsive */
         @media (max-width: 768px) {
@@ -2120,7 +2152,6 @@
                 max-height: 95vh;
                 margin: 10px;
             }
-            
             .pickup-content-container {
                 flex-direction: column;
             }
