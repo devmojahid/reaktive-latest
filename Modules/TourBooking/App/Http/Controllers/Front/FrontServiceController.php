@@ -368,7 +368,7 @@ final class FrontServiceController extends Controller
         $isListView = $request->isListView;
         $style = $request->style;
 
-        $allServices = Service::select('id', 'price_per_person', 'slug', 'location', 'is_featured', 'full_price', 'discount_price', 'is_new', 'duration', 'group_size', 'check_in_date', 'check_out_date', 'check_in_time', 'check_out_time')
+        $allServices = Service::select('id', 'price_per_person', 'slug', 'location', 'is_featured', 'full_price', 'discount_price', 'is_new', 'duration', 'group_size')
             ->withExists('myWishlist')
             ->where('status', true)
             ->with(['thumbnail:id,service_id,caption,file_path', 'translation:id,service_id,locale,title,short_description'])
@@ -396,15 +396,6 @@ final class FrontServiceController extends Controller
                 return $query->whereHas('tripTypes', function ($q) use ($request) {
                     $q->where('trip_types.id', $request->trip_id);
                 });
-            })
-            ->when($request->filled('check_in_check_out') && $request->check_in_check_out != 'null - null', function ($query) use ($request) {
-                $check_date = explode(' - ', $request->check_in_check_out);
-
-                $check_in_date  = \Carbon\Carbon::createFromFormat('m/d/Y', trim($check_date[0]))->format('Y-m-d');
-                $check_out_date = \Carbon\Carbon::createFromFormat('m/d/Y', trim($check_date[1]))->format('Y-m-d');
-
-                return $query->whereDate('check_in_date', '<=', $check_out_date)
-                             ->whereDate('check_out_date', '>=', $check_in_date);
             })
             ->when($request->filled('amenity_ids') && is_array($request->amenity_ids), function ($query) use ($request) {
                 $query->where(function ($q) use ($request) {

@@ -676,55 +676,49 @@
                                 {{-- Pickup Points --}}
                                 @if ($service->activePickupPoints->count() > 0)
                                     <div class="tg-tour-about-pickup mb-10">
-                                        <span class="tg-tour-about-sidebar-title mb-10 d-inline-block">{{ __('Pickup Point') }}:</span>
+                                        <span class="tg-tour-about-sidebar-title mb-10 d-inline-block">{{ __('Pickup Point') }} ({{ __('Optional') }}):</span>
                                         
-                                        {{-- Map Container --}}
-                                        <div id="pickup-map-container" style="height: 300px; margin-bottom: 15px; border-radius: 8px; overflow: hidden;"></div>
-                                        
-                                        {{-- Pickup Point Selection --}}
-                                        <div class="pickup-points-list">
-                                            <div x-show="pickupLoading" class="pickup-loading-overlay">
-                                                <div class="d-flex align-items-center justify-content-center py-3">
-                                                    <div class="spinner-border spinner-border-sm me-2" role="status">
-                                                        <span class="visually-hidden">Loading...</span>
+                                        {{-- Selected Pickup Display --}}
+                                        <div class="selected-pickup-display mb-3">
+                                            <div x-show="!selectedPickupPoint" class="no-pickup-selected">
+                                                <div class="pickup-placeholder d-flex align-items-center justify-content-between p-3" style="background: #f8f9fa; border: 1px dashed #dee2e6; border-radius: 8px; cursor: pointer;" @click="console.log('Placeholder clicked, showPickupModal:', showPickupModal); showPickupModal = true; console.log('After placeholder click:', showPickupModal)">
+                                                    <div>
+                                                        <i class="fa fa-map-marker text-muted me-2"></i>
+                                                        <span class="text-muted">{{ __('No pickup point selected') }}</span>
                                                     </div>
-                                                    <span>{{ __('Calculating charges...') }}</span>
+                                                    <small class="text-primary">{{ __('Click to choose') }} <i class="fa fa-chevron-right"></i></small>
                                                 </div>
                                             </div>
-                                            <template x-for="(pickup, index) in (pickupPoints || [])" :key="'pickup-' + (pickup?.id || index)">
-                                                <div class="pickup-point-item mb-2" :class="{'selected': selectedPickupPoint?.id === pickup?.id, 'loading': pickupLoading}">
-                                                    <div class="d-flex align-items-center">
-                                                        <input 
-                                                            type="radio" 
-                                                            name="pickup_point_id" 
-                                                            :value="pickup?.id || ''"
-                                                            :id="'pickup_' + (pickup?.id || index)"
-                                                            :checked="selectedPickupPoint?.id === pickup?.id"
-                                                            @change="selectPickupPoint(pickup)"
-                                                            :disabled="pickupLoading"
-                                                            class="me-2"
-                                                        >
-                                                        <label :for="'pickup_' + (pickup?.id || index)" class="pickup-point-label">
-                                                            <div class="pickup-info">
-                                                                <h6 class="pickup-name mb-1" x-text="pickup?.name || ''"></h6>
-                                                                <p class="pickup-address mb-0" x-text="pickup?.address || ''"></p>
-                                                                <div class="pickup-details d-flex justify-content-between">
-                                                                    <span class="pickup-charge" :class="pickup?.has_charge ? 'text-danger' : 'text-success'" x-text="pickup?.formatted_charge || 'Free'"></span>
-                                                                    <span x-show="pickup?.distance" class="pickup-distance text-muted" x-text="(pickup?.distance || 0) + ' km'"></span>
-                                                                </div>
-                                                            </div>
-                                                        </label>
+                                            
+                                            <div x-show="selectedPickupPoint" class="selected-pickup-card">
+                                                <div class="pickup-selected-card d-flex align-items-center justify-content-between p-3" style="background: #e3f2fd; border: 1px solid #2196f3; border-radius: 8px; cursor: pointer;" @click="console.log('Selected card clicked, showPickupModal:', showPickupModal); showPickupModal = true; console.log('After selected click:', showPickupModal)">
+                                                    <div class="selected-info">
+                                                        <div class="d-flex align-items-center mb-1">
+                                                            <i class="fa fa-map-marker text-primary me-2"></i>
+                                                            <span class="fw-bold text-primary" x-text="selectedPickupPoint?.name || ''"></span>
+                                                        </div>
+                                                        <small class="text-muted d-block" x-text="selectedPickupPoint?.address || ''"></small>
+                                                        <div class="charge-display mt-1">
+                                                            <span class="badge" :class="selectedPickupPoint?.has_charge ? 'bg-danger' : 'bg-success'" x-text="selectedPickupPoint?.formatted_charge || 'Free'"></span>
+                                                            <span x-show="selectedPickupPoint?.distance" class="badge bg-secondary ms-1" x-text="(selectedPickupPoint?.distance || 0) + ' km away'"></span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="change-btn">
+                                                        <small class="text-primary">{{ __('Change') }} <i class="fa fa-edit"></i></small>
                                                     </div>
                                                 </div>
-                                            </template>
+                                            </div>
                                         </div>
 
-                                        {{-- Location Detection --}}
-                                        <div class="pickup-location-actions mt-2">
-                                            <button type="button" @click="getCurrentLocation()" class="btn btn-sm btn-outline-primary">
-                                                <i class="fa fa-location-arrow"></i> {{ __('Find Nearest') }}
+                                        {{-- Quick Action Button --}}
+                                        <div class="pickup-actions d-flex gap-2">
+                                            <button type="button" @click="console.log('Opening pickup modal...', showPickupModal); showPickupModal = true; console.log('After click:', showPickupModal)" class="btn btn-outline-primary btn-sm flex-fill">
+                                                <i class="fa fa-map-marker me-1"></i>
+                                                <span x-text="selectedPickupPoint ? '{{ __('Change Pickup') }}' : '{{ __('Choose Pickup Point') }}'"></span>
                                             </button>
-                                            <span x-show="locationLoading" class="text-muted ms-2">{{ __('Getting location...') }}</span>
+                                            <button x-show="selectedPickupPoint" type="button" @click="clearPickupPoint()" class="btn btn-outline-secondary btn-sm">
+                                                <i class="fa fa-times"></i>
+                                            </button>
                                         </div>
                                     </div>
                                     <div class="tg-tour-about-border-doted mb-15"></div>
@@ -750,6 +744,141 @@
 
                                 <button type="submit" class="tg-btn tg-btn-switch-animation w-100">Book now</button>
                             </form>
+
+                            {{-- ===== PICKUP POINT SELECTION MODAL ===== --}}
+                            <div x-show="showPickupModal" x-init="console.log('Modal element initialized, showPickupModal:', showPickupModal)" class="pickup-modal-overlay" @click.self="showPickupModal = false" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px;" x-cloak>
+                                <div class="pickup-modal-content" style="background: white; border-radius: 12px; width: 100%; max-width: 900px; max-height: 90vh; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+                                    {{-- Modal Header --}}
+                                    <div class="pickup-modal-header d-flex align-items-center justify-content-between p-4" style="border-bottom: 1px solid #dee2e6; background: #f8f9fa;">
+                                        <div>
+                                            <h5 class="mb-0">
+                                                <i class="fa fa-map-marker text-primary me-2"></i>
+                                                {{ __('Choose Pickup Point') }}
+                                            </h5>
+                                            <small class="text-muted">{{ __('Select a pickup location or continue without one') }}</small>
+                                        </div>
+                                        <button type="button" @click="showPickupModal = false" class="btn-close"></button>
+                                    </div>
+
+                                    {{-- Modal Body --}}
+                                    <div class="pickup-modal-body" style="height: 70vh; overflow: hidden; display: flex; flex-direction: column;">
+                                        {{-- Location Actions --}}
+                                        <div class="pickup-location-bar d-flex align-items-center justify-content-between p-3" style="background: #f1f3f4; border-bottom: 1px solid #dee2e6;">
+                                            <div class="location-status">
+                                                <span x-show="!userLocation" class="text-muted">
+                                                    <i class="fa fa-location-slash me-1"></i>
+                                                    {{ __('Location not detected') }}
+                                                </span>
+                                                <span x-show="userLocation" class="text-success">
+                                                    <i class="fa fa-location-arrow me-1"></i>
+                                                    {{ __('Location detected - sorted by distance') }}
+                                                </span>
+                                            </div>
+                                            <button type="button" @click="getCurrentLocation()" class="btn btn-sm btn-outline-primary" :disabled="locationLoading">
+                                                <i :class="locationLoading ? 'fa fa-spinner fa-spin' : 'fa fa-location-arrow'" class="me-1"></i>
+                                                <span x-text="locationLoading ? '{{ __('Getting location...') }}' : '{{ __('Find Nearest') }}'"></span>
+                                            </button>
+                                        </div>
+
+                                        {{-- Content Container --}}
+                                        <div class="pickup-content-container d-flex flex-fill" style="height: calc(100% - 60px);">
+                                            {{-- Map Section --}}
+                                            <div class="pickup-map-section" style="flex: 1; min-height: 100%;">
+                                                <div id="pickup-map-container-modal" style="width: 100%; height: 100%; border: none;"></div>
+                                            </div>
+
+                                            {{-- Points List Section --}}
+                                            <div class="pickup-list-section" style="width: 350px; border-left: 1px solid #dee2e6; background: #fafafa; overflow-y: auto;">
+                                                <div class="pickup-list-header p-3" style="background: white; border-bottom: 1px solid #dee2e6; position: sticky; top: 0; z-index: 10;">
+                                                    <h6 class="mb-2">{{ __('Available Pickup Points') }}</h6>
+                                                    <small class="text-muted">{{ __('Click on a point to select it') }}</small>
+                                                </div>
+
+                                                {{-- Loading Overlay --}}
+                                                <div x-show="pickupLoading" class="pickup-loading-overlay position-relative">
+                                                    <div class="d-flex align-items-center justify-content-center py-4">
+                                                        <div class="spinner-border spinner-border-sm me-2" role="status">
+                                                            <span class="visually-hidden">Loading...</span>
+                                                        </div>
+                                                        <span>{{ __('Calculating charges...') }}</span>
+                                                    </div>
+                                                </div>
+
+                                                {{-- Points List --}}
+                                                <div class="pickup-points-modal-list p-3">
+                                                    <template x-for="(pickup, index) in (pickupPoints || [])" :key="'modal-pickup-' + (pickup?.id || index)">
+                                                        <div class="pickup-point-modal-item mb-3" :class="{'selected': selectedPickupPoint?.id === pickup?.id}" @click="selectPickupPointModal(pickup)">
+                                                            <div class="pickup-modal-card p-3" style="background: white; border-radius: 8px; border: 2px solid transparent; cursor: pointer; transition: all 0.2s;" :class="selectedPickupPoint?.id === pickup?.id ? 'border-primary shadow-sm' : 'border-light'">
+                                                                {{-- Point Header --}}
+                                                                <div class="d-flex align-items-start justify-content-between mb-2">
+                                                                    <div class="pickup-modal-info flex-fill">
+                                                                        <h6 class="pickup-modal-name mb-1" x-text="pickup?.name || 'Unknown'" :class="selectedPickupPoint?.id === pickup?.id ? 'text-primary' : 'text-dark'"></h6>
+                                                                        <div class="d-flex align-items-center gap-2 mb-1">
+                                                                            <span x-show="pickup?.is_default" class="badge bg-warning text-dark">
+                                                                                <i class="fa fa-star me-1"></i>{{ __('Default') }}
+                                                                            </span>
+                                                                            <span x-show="pickup?.distance" class="badge bg-info">
+                                                                                <i class="fa fa-road me-1"></i><span x-text="pickup?.distance + ' km'"></span>
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="selection-indicator">
+                                                                        <i x-show="selectedPickupPoint?.id === pickup?.id" class="fa fa-check-circle text-primary fa-lg"></i>
+                                                                        <i x-show="selectedPickupPoint?.id !== pickup?.id" class="far fa-circle text-muted"></i>
+                                                                    </div>
+                                                                </div>
+
+                                                                {{-- Address --}}
+                                                                <p class="pickup-modal-address mb-2 text-muted" style="font-size: 13px; line-height: 1.3;" x-text="pickup?.address || ''"></p>
+
+                                                                {{-- Description --}}
+                                                                <p x-show="pickup?.description" class="pickup-modal-description mb-2 text-muted" style="font-size: 12px; font-style: italic;" x-text="pickup?.description || ''"></p>
+
+                                                                {{-- Charge Info --}}
+                                                                <div class="pickup-modal-charge">
+                                                                    <span class="badge fs-6" :class="pickup?.has_charge ? 'bg-danger' : 'bg-success'" x-text="pickup?.formatted_charge || 'Free'"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </template>
+
+                                                    {{-- No Points Message --}}
+                                                    <div x-show="!pickupLoading && (!pickupPoints || pickupPoints.length === 0)" class="text-center py-4">
+                                                        <i class="fa fa-map-marker-alt fa-3x text-muted mb-3"></i>
+                                                        <p class="text-muted">{{ __('No pickup points available for this service') }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {{-- Modal Footer --}}
+                                    <div class="pickup-modal-footer d-flex align-items-center justify-content-between p-4" style="border-top: 1px solid #dee2e6; background: #f8f9fa;">
+                                        <div class="selected-pickup-summary">
+                                            <div x-show="!selectedPickupPoint" class="text-muted">
+                                                <i class="fa fa-info-circle me-1"></i>
+                                                {{ __('No pickup point selected - you can proceed without one') }}
+                                            </div>
+                                            <div x-show="selectedPickupPoint" class="selected-summary">
+                                                <strong class="text-primary">
+                                                    <i class="fa fa-map-marker me-1"></i>
+                                                    <span x-text="selectedPickupPoint?.name"></span>
+                                                </strong>
+                                                <small class="d-block text-muted" x-text="selectedPickupPoint?.formatted_charge"></small>
+                                            </div>
+                                        </div>
+                                        <div class="modal-actions">
+                                            <button type="button" @click="clearPickupPointModal()" class="btn btn-outline-secondary me-2">
+                                                {{ __('Clear Selection') }}
+                                            </button>
+                                            <button type="button" @click="confirmPickupSelection()" class="btn btn-primary">
+                                                <i class="fa fa-check me-1"></i>
+                                                {{ __('Confirm Selection') }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     {{-- ======================= /BOOK NOW SIDEBAR ======================= --}}
@@ -1114,9 +1243,12 @@
                 pickupExtraCharge: 0,
                 pickupLoading: false,
                 pickupMap: null,
+                pickupModalMap: null,
                 pickupMarkers: [],
+                pickupModalMarkers: [],
                 userLocation: null,
                 locationLoading: false,
+                showPickupModal: false,
 
                 init() {
                     const input = document.querySelector("input[name='check_in_date']");
@@ -1156,8 +1288,14 @@
                     // Only fetch if service has pickup points
                     @if ($service->activePickupPoints->count() > 0)
                         this.fetchPickupPoints();
-                        this.$nextTick(() => {
-                            this.initMap();
+                        
+                        // Initialize modal map when modal is shown
+                        this.$watch('showPickupModal', (isShown) => {
+                            if (isShown) {
+                                this.$nextTick(() => {
+                                    this.initModalMap();
+                                });
+                            }
                         });
                     @endif
                 },
@@ -1202,7 +1340,8 @@
                                 if (!this.selectedPickupPoint) {
                                     const defaultPickup = this.pickupPoints.find(p => p.is_default);
                                     if (defaultPickup) {
-                                        this.selectPickupPoint(defaultPickup);
+                                        // Don't auto-select - keep it optional
+                                        // this.selectPickupPoint(defaultPickup);
                                     }
                                 }
                             } else {
@@ -1217,35 +1356,48 @@
                     });
                 },
 
-                initMap() {
-                    const mapContainer = document.getElementById('pickup-map-container');
-                    if (!mapContainer || this.pickupMap) return;
+                initModalMap() {
+                    const mapContainer = document.getElementById('pickup-map-container-modal');
+                    if (!mapContainer || this.pickupModalMap) return;
+
+                    console.log('Initializing modal map...');
 
                     // Default to service location or a general location
                     const defaultLat = {{ $service->latitude ?? '40.7128' }};
                     const defaultLng = {{ $service->longitude ?? '-74.0060' }};
 
-                    this.pickupMap = L.map('pickup-map-container').setView([defaultLat, defaultLng], 12);
-                    
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '© OpenStreetMap contributors'
-                    }).addTo(this.pickupMap);
+                    try {
+                        this.pickupModalMap = L.map('pickup-map-container-modal').setView([defaultLat, defaultLng], 12);
+                        
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution: '© OpenStreetMap contributors'
+                        }).addTo(this.pickupModalMap);
 
-                    this.updateMapMarkers();
+                        // Wait for map to load then update markers
+                        this.pickupModalMap.whenReady(() => {
+                            this.updateModalMapMarkers();
+                        });
+
+                        console.log('Modal map initialized successfully');
+                    } catch (error) {
+                        console.error('Error initializing modal map:', error);
+                    }
                 },
 
-                updateMapMarkers() {
-                    if (!this.pickupMap || !Array.isArray(this.pickupPoints)) return;
+                updateModalMapMarkers() {
+                    if (!this.pickupModalMap || !Array.isArray(this.pickupPoints)) return;
+
+                    console.log('Updating modal map markers...');
 
                     // Clear existing markers
-                    this.pickupMarkers.forEach(marker => {
+                    this.pickupModalMarkers.forEach(marker => {
                         try {
-                            this.pickupMap.removeLayer(marker);
+                            this.pickupModalMap.removeLayer(marker);
                         } catch (e) {
-                            console.warn('Error removing marker:', e);
+                            console.warn('Error removing modal marker:', e);
                         }
                     });
-                    this.pickupMarkers = [];
+                    this.pickupModalMarkers = [];
 
                     const bounds = [];
 
@@ -1267,21 +1419,21 @@
                         if (isDefault && !isSelected) color = '#ffc107'; // default - yellow
 
                         const icon = L.divIcon({
-                            className: 'custom-pickup-marker',
+                            className: 'custom-pickup-marker-modal',
                             html: `
                                 <div class="marker-wrapper">
-                                    <i class="fa fa-map-marker" style="color: ${color}; font-size: 28px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);"></i>
+                                    <i class="fa fa-map-marker" style="color: ${color}; font-size: 32px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);"></i>
                                     ${isSelected ? '<div class="selected-pulse"></div>' : ''}
                                     ${isDefault ? '<div class="default-badge">★</div>' : ''}
                                 </div>
                             `,
-                            iconSize: [35, 35],
-                            iconAnchor: [17, 32]
+                            iconSize: [40, 40],
+                            iconAnchor: [20, 35]
                         });
 
                         try {
                             const marker = L.marker([pickup.coordinates.lat, pickup.coordinates.lng], {icon: icon})
-                                .addTo(this.pickupMap);
+                                .addTo(this.pickupModalMap);
 
                             // Enhanced popup with better information
                             const distanceText = pickup.distance ? `<p class="mb-1"><i class="fa fa-road"></i> <strong>${pickup.distance} km away</strong></p>` : '';
@@ -1297,7 +1449,7 @@
                                     ${distanceText}
                                     ${pickup.description ? `<p class="mb-0"><i class="fa fa-info-circle"></i> ${pickup.description}</p>` : ''}
                                     <div class="text-center mt-2">
-                                        <button class="btn btn-sm ${isSelected ? 'btn-success' : 'btn-primary'}" onclick="selectPickupFromMap(${pickup.id})">
+                                        <button class="btn btn-sm ${isSelected ? 'btn-success' : 'btn-primary'}" onclick="selectPickupFromModalMap(${pickup.id})">
                                             ${isSelected ? '✓ Selected' : 'Select Point'}
                                         </button>
                                     </div>
@@ -1310,13 +1462,13 @@
                             });
                             
                             marker.on('click', () => {
-                                this.selectPickupPoint(pickup);
+                                this.selectPickupPointModal(pickup);
                             });
 
                             bounds.push([pickup.coordinates.lat, pickup.coordinates.lng]);
-                            this.pickupMarkers.push(marker);
+                            this.pickupModalMarkers.push(marker);
                         } catch (e) {
-                            console.error('Error creating marker for pickup:', pickup.name, e);
+                            console.error('Error creating modal marker for pickup:', pickup.name, e);
                         }
                     });
 
@@ -1324,63 +1476,67 @@
                     if (this.userLocation?.lat && this.userLocation?.lng) {
                         try {
                             const userIcon = L.divIcon({
-                                className: 'user-location-marker',
+                                className: 'user-location-marker-modal',
                                 html: `
                                     <div class="user-marker">
-                                        <i class="fa fa-location-arrow" style="color: #007bff; font-size: 22px;"></i>
+                                        <i class="fa fa-location-arrow" style="color: #007bff; font-size: 26px;"></i>
                                         <div class="user-pulse"></div>
                                     </div>
                                 `,
-                                iconSize: [25, 25],
-                                iconAnchor: [12, 12]
+                                iconSize: [30, 30],
+                                iconAnchor: [15, 15]
                             });
 
                             const userMarker = L.marker([this.userLocation.lat, this.userLocation.lng], {icon: userIcon})
-                                .addTo(this.pickupMap)
+                                .addTo(this.pickupModalMap)
                                 .bindPopup('<div class="text-center"><h6><i class="fa fa-user"></i> Your Location</h6></div>');
 
                             bounds.push([this.userLocation.lat, this.userLocation.lng]);
-                            this.pickupMarkers.push(userMarker);
+                            this.pickupModalMarkers.push(userMarker);
                         } catch (e) {
                             console.error('Error creating user location marker:', e);
                         }
                     }
 
-                    // Auto-fit map bounds or focus on default pickup
+                    // Auto-fit map bounds
                     try {
                         if (bounds.length > 1) {
-                            this.pickupMap.fitBounds(bounds, { padding: [20, 20] });
+                            this.pickupModalMap.fitBounds(bounds, { padding: [20, 20] });
                         } else if (bounds.length === 1) {
-                            this.pickupMap.setView(bounds[0], 14);
+                            this.pickupModalMap.setView(bounds[0], 14);
                         } else {
                             // Focus on default pickup point if available
                             const defaultPickup = this.pickupPoints.find(p => p.is_default);
                             if (defaultPickup && defaultPickup.coordinates) {
-                                this.pickupMap.setView([defaultPickup.coordinates.lat, defaultPickup.coordinates.lng], 14);
+                                this.pickupModalMap.setView([defaultPickup.coordinates.lat, defaultPickup.coordinates.lng], 14);
                             }
                         }
+
+                        // Force map resize
+                        setTimeout(() => {
+                            if (this.pickupModalMap) {
+                                this.pickupModalMap.invalidateSize();
+                            }
+                        }, 300);
                     } catch (e) {
-                        console.error('Error setting map bounds:', e);
+                        console.error('Error setting modal map bounds:', e);
                     }
 
                     // Store reference for popup button clicks
-                    window.selectPickupFromMap = (pickupId) => {
+                    window.selectPickupFromModalMap = (pickupId) => {
                         const pickup = this.pickupPoints.find(p => p.id === pickupId);
                         if (pickup) {
-                            this.selectPickupPoint(pickup);
+                            this.selectPickupPointModal(pickup);
                         }
                     };
                 },
 
-                selectPickupPoint(pickup) {
+                // Modal-specific selection methods
+                selectPickupPointModal(pickup) {
                     if (!pickup || !pickup.id) {
                         console.warn('Invalid pickup point:', pickup);
                         return;
                     }
-
-                    // Clear previous selection
-                    this.selectedPickupPoint = null;
-                    this.pickupExtraCharge = 0;
 
                     // Set new selection  
                     this.selectedPickupPoint = { ...pickup };
@@ -1388,10 +1544,33 @@
                     // Calculate new charge
                     this.calculatePickupCharge();
                     
-                    // Update map markers to reflect selection
-                    this.updateMapMarkers();
+                    // Update modal map markers to reflect selection
+                    this.updateModalMapMarkers();
                     
-                    console.log('Pickup point selected:', pickup.name, 'Charge:', this.pickupExtraCharge);
+                    console.log('Pickup point selected in modal:', pickup.name, 'Charge:', this.pickupExtraCharge);
+                },
+
+                clearPickupPointModal() {
+                    this.selectedPickupPoint = null;
+                    this.pickupExtraCharge = 0;
+                    this.updateModalMapMarkers();
+                },
+
+                confirmPickupSelection() {
+                    this.showPickupModal = false;
+                    console.log('Pickup selection confirmed:', this.selectedPickupPoint?.name || 'None');
+                },
+
+                clearPickupPoint() {
+                    this.selectedPickupPoint = null;
+                    this.pickupExtraCharge = 0;
+                },
+
+                // Compatibility function for any remaining calls
+                updateMapMarkers() {
+                    if (this.pickupModalMap) {
+                        this.updateModalMapMarkers();
+                    }
                 },
 
                 calculatePickupCharge() {
@@ -1716,6 +1895,82 @@
             font-weight: 600;
         }
 
+        /* New Modal UI Styles */
+        .pickup-placeholder:hover {
+            background: #e9ecef !important;
+            border-color: #adb5bd !important;
+        }
+
+        .pickup-selected-card:hover {
+            background: #d1ecf1 !important;
+            border-color: #0c5460 !important;
+        }
+
+        .pickup-modal-overlay[x-cloak] {
+            display: none !important;
+        }
+
+        .pickup-modal-content {
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .pickup-modal-item:hover .pickup-modal-card {
+            background: #f8f9fa !important;
+            border-color: #6c757d !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+        }
+
+        .pickup-modal-item.selected .pickup-modal-card {
+            background: #e3f2fd !important;
+            border-color: #2196f3 !important;
+        }
+
+        .pickup-modal-name {
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .pickup-modal-address {
+            line-height: 1.3;
+        }
+
+        .pickup-modal-description {
+            line-height: 1.3;
+        }
+
+        .pickup-modal-charge .badge {
+            font-weight: 500;
+        }
+
+        .pickup-list-section::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .pickup-list-section::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .pickup-list-section::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .pickup-list-section::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
         /* Pickup Loading Overlay */
         .pickup-loading-overlay {
             position: absolute;
@@ -1751,33 +2006,11 @@
             font-style: italic;
         }
 
-        /* Map Styles */
-        #pickup-map-container {
-            border: 2px solid #dee2e6;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            border-radius: 8px !important;
-            height: 350px !important;
-        }
-
-        .leaflet-popup-content {
-            margin: 8px 12px;
-            line-height: 1.4;
-        }
-
-        .pickup-popup h6 {
-            margin: 0 0 8px 0;
-            color: #333;
-            font-weight: 600;
-        }
-
-        .pickup-popup p {
-            margin: 0 0 4px 0;
-            font-size: 13px;
-        }
-
         /* Enhanced Marker Styles */
         .custom-pickup-marker,
-        .user-location-marker {
+        .custom-pickup-marker-modal,
+        .user-location-marker,
+        .user-location-marker-modal {
             background: none;
             border: none;
         }
@@ -1791,8 +2024,8 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 45px;
-            height: 45px;
+            width: 50px;
+            height: 50px;
             border: 3px solid #007bff;
             border-radius: 50%;
             transform: translate(-50%, -50%);
@@ -1826,8 +2059,8 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 35px;
-            height: 35px;
+            width: 40px;
+            height: 40px;
             border: 2px solid #007bff;
             border-radius: 50%;
             transform: translate(-50%, -50%);
@@ -1883,21 +2116,47 @@
 
         /* Mobile Responsive */
         @media (max-width: 768px) {
-            #pickup-map-container {
-                height: 250px !important;
+            .pickup-modal-content {
+                max-height: 95vh;
+                margin: 10px;
             }
             
-            .pickup-point-item {
-                padding: 8px;
+            .pickup-content-container {
+                flex-direction: column;
             }
             
-            .pickup-name {
-                font-size: 14px;
+            .pickup-map-section {
+                height: 300px;
+                flex: none;
             }
             
-            .pickup-address {
-                font-size: 12px;
+            .pickup-list-section {
+                width: 100% !important;
+                border-left: none;
+                border-top: 1px solid #dee2e6;
+                max-height: 50vh;
+            }
+            
+            .pickup-modal-footer {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .pickup-modal-footer .modal-actions {
+                width: 100%;
+                display: flex;
+                gap: 10px;
+            }
+            
+            .pickup-modal-footer .modal-actions button {
+                flex: 1;
+            }
+            
+            .selected-pickup-summary {
+                width: 100%;
+                text-align: center;
             }
         }
     </style>
 @endpush
+
